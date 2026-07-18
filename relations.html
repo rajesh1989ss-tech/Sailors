@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PRM — Personal Relations Manager</title>
+<meta name="theme-color" content="#0a1220">
+<link rel="manifest" href="prm.webmanifest">
+<style>
+:root{
+  --bg:#0a1220; --bg2:#0e1a2e; --card:#121f36; --card2:#182742;
+  --line:#22355a; --line2:#2c4270;
+  --txt:#e8effc; --txt-dim:#aebdd8; --txt-mute:#7487a8;
+  --amber:#f5b74a; --amber2:#e09a1f; --navy:#2f6fd0; --navy2:#5590e8;
+  --ok:#3ecf8e; --warn:#f5b74a; --danger:#ef5b5b; --watch:#5ea8f5;
+  --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior-y:contain}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select,textarea{font:inherit;color:var(--txt);background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;width:100%;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--navy2)}
+input[type=file]{padding:7px}
+input[type=date]{color-scheme:dark}
+label{font-size:.78rem;font-weight:600;color:var(--txt-dim);display:block;margin-bottom:5px;letter-spacing:.3px}
+.field{margin-bottom:13px}
+.hint{font-size:.72rem;color:var(--txt-mute);margin-top:4px;line-height:1.4}
+h2{font-size:1.15rem;font-weight:800;margin-bottom:4px}
+.sheet-sub{font-size:.8rem;color:var(--txt-mute);margin-bottom:14px}
+
+/* ---- App shell ---- */
+#app{max-width:760px;margin:0 auto;padding:14px 14px 88px}
+.apphead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.apphead .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--amber),var(--amber2));display:grid;place-items:center;font-weight:900;color:#221503;font-size:1.05rem;flex:0 0 auto}
+.apphead h1{font-size:1.25rem;font-weight:900;letter-spacing:.2px}
+.apphead .sub{font-size:.7rem;color:var(--txt-mute);letter-spacing:.5px;text-transform:uppercase}
+.searchwrap{position:relative;margin-bottom:12px}
+.searchwrap input{padding-left:36px;border-radius:999px;background:var(--card)}
+.searchwrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--txt-mute)}
+
+/* ---- Bottom nav ---- */
+#bnav{position:fixed;left:0;right:0;bottom:0;z-index:500;background:rgba(10,18,32,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);display:flex;max-width:760px;margin:0 auto}
+#bnav button{flex:1;padding:9px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.64rem;font-weight:700;color:var(--txt-mute);letter-spacing:.3px}
+#bnav button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+#bnav button.active{color:var(--amber)}
+
+/* ---- Cards / rows ---- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.card-h{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--txt-dim);margin-bottom:10px}
+.card-h svg{width:15px;height:15px;stroke:var(--amber);fill:none;stroke-width:2}
+.crow{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent}
+.crow:hover{background:var(--card2)}
+.crow:active{background:var(--card2)}
+.ava{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:.95rem;color:#08111f;flex:0 0 auto;overflow:hidden;background:linear-gradient(135deg,var(--navy2),var(--navy))}
+.ava img{width:100%;height:100%;object-fit:cover}
+.ava.sm{width:30px;height:30px;border-radius:9px;font-size:.72rem}
+.cinfo{flex:1;min-width:0}
+.cname{font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmeta{font-size:.72rem;color:var(--txt-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.alpha-h{font-size:.72rem;font-weight:800;color:var(--amber);padding:9px 4px 3px;letter-spacing:1px}
+.pin-ic{color:var(--amber);flex:0 0 auto}
+
+/* ---- Pinned strip ---- */
+.pinstrip{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
+.pinstrip::-webkit-scrollbar{display:none}
+.pincell{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;flex:0 0 auto;width:62px}
+.pincell .ava{width:52px;height:52px;border-radius:16px}
+.pincell span{font-size:.66rem;font-weight:600;color:var(--txt-dim);max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---- Upcoming strip ---- */
+.uprow{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:9px;cursor:pointer;border-left:3px solid transparent;margin-bottom:5px;background:var(--bg2)}
+.uprow:hover{background:var(--card2)}
+.upd{font-size:.68rem;font-weight:800;min-width:58px;text-align:center;padding:4px 6px;border-radius:7px;flex:0 0 auto}
+.uptxt{flex:1;min-width:0;font-size:.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upsub{font-size:.66rem;color:var(--txt-mute)}
+.t-expired{border-left-color:var(--danger)} .t-expired .upd{background:#42171c;color:#ff9d9d}
+.t-amber{border-left-color:var(--warn)} .t-amber .upd{background:#3d2e0e;color:#ffd98a}
+.t-watch{border-left-color:var(--watch)} .t-watch .upd{background:#12304f;color:#a6d2ff}
+.t-soon{border-left-color:var(--ok)} .t-soon .upd{background:#0e3a2a;color:#8af0c6}
+.t-appt{border-left-color:#b58af0} .t-appt .upd{background:#2c1d4a;color:#d6bafc}
+
+/* ---- Chips ---- */
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.chip{padding:5px 13px;border-radius:999px;border:1px solid var(--line2);font-size:.74rem;font-weight:700;color:var(--txt-dim);background:var(--card)}
+.chip.on{background:var(--amber);border-color:var(--amber);color:#221503}
+.gdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:0}
+
+/* ---- Buttons ---- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:10px;font-weight:700;font-size:.86rem;letter-spacing:.2px}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
+.btn-primary{background:linear-gradient(135deg,var(--amber),var(--amber2));color:#221503}
+.btn-accent{background:var(--navy);color:#fff}
+.btn-ghost{background:var(--card2);border:1px solid var(--line2);color:var(--txt)}
+.btn-danger{background:#4a1a1f;border:1px solid #7a2c33;color:#ff9d9d}
+.btn-block{width:100%}
+.btn-sm{padding:6px 12px;font-size:.76rem;border-radius:8px}
+.icon-btn{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--card2);border:1px solid var(--line2);flex:0 0 auto}
+.icon-btn svg{width:16px;height:16px;stroke:var(--txt-dim);fill:none;stroke-width:2}
+#fab{position:fixed;right:18px;bottom:72px;z-index:490;width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,var(--amber),var(--amber2));color:#221503;font-size:1.7rem;font-weight:800;box-shadow:0 8px 22px rgba(245,183,74,.35);display:grid;place-items:center}
+
+/* ---- Sheet ---- */
+#sheetBack{position:fixed;inset:0;background:rgba(4,8,16,.72);z-index:900;display:none}
+#sheetBack.open{display:block}
+#sheet{position:fixed;left:0;right:0;bottom:0;top:6vh;z-index:901;background:var(--bg2);border-radius:18px 18px 0 0;border:1px solid var(--line);border-bottom:0;max-width:760px;margin:0 auto;display:none;flex-direction:column}
+#sheet.open{display:flex}
+#sheetGrip{padding:10px 0 4px;display:grid;place-items:center;flex:0 0 auto}
+#sheetGrip i{width:44px;height:4px;border-radius:3px;background:var(--line2);display:block}
+#sheetBody{overflow-y:auto;padding:8px 18px 30px;flex:1}
+.sheet-x{position:absolute;right:12px;top:12px;z-index:5}
+
+/* ---- Profile ---- */
+.prof-head{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.prof-head .ava{width:62px;height:62px;border-radius:18px;font-size:1.3rem}
+.pn{font-size:1.25rem;font-weight:900;line-height:1.15}
+.pr{font-size:.75rem;color:var(--txt-mute);margin-top:3px}
+.gtag{display:inline-block;font-size:.64rem;font-weight:800;padding:2px 9px;border-radius:6px;margin:2px 4px 0 0;color:#08111f}
+.qacts{display:flex;gap:9px;margin:10px 0 4px}
+.qacts a{flex:1;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px;border-radius:11px;background:var(--card);border:1px solid var(--line);color:var(--txt-dim);font-size:.66rem;font-weight:700}
+.qacts a svg{width:17px;height:17px;stroke:var(--amber);fill:none;stroke-width:2}
+.ptabs{display:flex;gap:4px;overflow-x:auto;margin:12px 0;scrollbar-width:none;border-bottom:1px solid var(--line);padding-bottom:8px}
+.ptabs::-webkit-scrollbar{display:none}
+.ptab{padding:7px 13px;border-radius:9px;font-size:.76rem;font-weight:700;color:var(--txt-mute);white-space:nowrap;flex:0 0 auto}
+.ptab.active{background:var(--card2);color:var(--amber)}
+.ptab .pill{display:inline-block;margin-left:5px;font-size:.62rem;background:var(--line);border-radius:8px;padding:1px 6px;color:var(--txt-dim)}
+.inf-row{display:flex;gap:10px;padding:8px 2px;border-bottom:1px solid var(--line);font-size:.86rem;align-items:baseline}
+.inf-row b{flex:0 0 118px;font-size:.72rem;color:var(--txt-mute);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.inf-row span{flex:1;word-break:break-word}
+.note-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:9px}
+.note-card.newest{border-color:var(--amber);background:linear-gradient(180deg,#1c2436,var(--card))}
+.note-ts{font-size:.64rem;color:var(--txt-mute);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.note-tx{font-size:.86rem;white-space:pre-wrap;line-height:1.5}
+.mini-del{color:var(--txt-mute);font-size:.72rem;padding:2px 6px}
+.mini-del:hover{color:var(--danger)}
+.prom-row{display:flex;align-items:flex-start;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line)}
+.prom-row input[type=checkbox]{width:18px;height:18px;flex:0 0 auto;margin-top:2px;accent-color:var(--amber)}
+.prom-tx{flex:1;font-size:.86rem}
+.prom-tx.done{color:var(--txt-mute);text-decoration:line-through}
+.prom-ts{font-size:.64rem;color:var(--txt-mute)}
+
+/* ---- Docs / files ---- */
+.file-row{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:10px;border:1px solid var(--line);margin-bottom:8px;background:var(--card)}
+.file-thumb{width:44px;height:44px;border-radius:10px;background:var(--card2);display:grid;place-items:center;overflow:hidden;flex:0 0 auto;font-size:.6rem;font-weight:800;color:var(--txt-dim)}
+.file-thumb img{width:100%;height:100%;object-fit:cover}
+.file-info{flex:1;min-width:0}
+.file-name{font-size:.84rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-meta{font-size:.66rem;color:var(--txt-mute);margin-top:1px}
+.file-acts{display:flex;gap:5px}
+.tier-badge{display:inline-block;font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:6px;letter-spacing:.3px}
+.tb-expired{background:#42171c;color:#ff9d9d} .tb-amber{background:#3d2e0e;color:#ffd98a}
+.tb-watch{background:#12304f;color:#a6d2ff} .tb-ok{background:#0e3a2a;color:#8af0c6}
+.photo-strip{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.photo-strip .ph{width:64px;height:64px;border-radius:10px;overflow:hidden;position:relative;border:1px solid var(--line2)}
+.photo-strip .ph img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.photo-strip .ph button{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:6px;background:rgba(0,0,0,.65);color:#fff;font-size:.65rem;line-height:1;display:grid;place-items:center}
+.dyn-row{display:flex;gap:7px;margin-bottom:7px;align-items:center}
+.dyn-row input,.dyn-row select{margin:0}
+.dyn-row .rm{flex:0 0 30px;height:38px;border-radius:9px;background:var(--card2);border:1px solid var(--line2);color:var(--txt-mute)}
+.addline{font-size:.76rem;font-weight:700;color:var(--navy2);padding:4px 2px}
+
+/* ---- Lightbox ---- */
+#lightbox{position:fixed;inset:0;z-index:1200;background:rgba(2,5,10,.93);display:none;place-items:center;padding:20px}
+#lightbox.open{display:grid}
+#lightbox img{max-width:100%;max-height:92vh;border-radius:10px}
+
+/* ---- Toast ---- */
+#toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%) translateY(20px);z-index:1500;background:#1b2d4d;border:1px solid var(--line2);color:var(--txt);padding:10px 18px;border-radius:11px;font-size:.82rem;font-weight:600;opacity:0;pointer-events:none;transition:.22s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:#4a1a1f;border-color:#7a2c33;color:#ffb3b3}
+#toast.ok{background:#0e3a2a;border-color:#1d6a4d;color:#a9f2d3}
+
+/* ---- Report cards (Reports view) ---- */
+.rep-card{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer}
+.rep-card:hover{background:var(--card2)}
+.rep-ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto}
+.rep-ic svg{width:20px;height:20px;fill:none;stroke-width:2}
+.rep-t{font-weight:800;font-size:.92rem}
+.rep-s{font-size:.7rem;color:var(--txt-mute);margin-top:2px}
+
+/* ---- PRINT PREVIEW (in-page; window.print() only on button) ---- */
+#printWrap{position:fixed;inset:0;z-index:2000;background:#3a4356;display:none;flex-direction:column}
+#printWrap.open{display:flex}
+#printBar{flex:0 0 auto;display:flex;gap:10px;align-items:center;padding:10px 16px;background:#0a1220;border-bottom:1px solid var(--line)}
+#printBar .sp{flex:1}
+#printScroll{flex:1;overflow:auto;padding:24px 10px}
+.pp{background:#fff;color:#182338;max-width:820px;margin:0 auto 24px;padding:34px 40px;border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.45);font-size:.86rem;line-height:1.5}
+.pp h1{font-size:1.5rem;color:#0b1c3a;margin-bottom:2px;font-weight:900}
+.pp .pp-sub{font-size:.72rem;color:#6a7a95;margin-bottom:18px;letter-spacing:.4px;text-transform:uppercase;font-weight:700}
+.pp h3{font-size:.8rem;color:#0b1c3a;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.6px;border-bottom:2px solid #f5b74a;padding-bottom:4px}
+.pp table{width:100%;border-collapse:collapse;margin:6px 0 10px}
+.pp th{font-size:.66rem;text-transform:uppercase;letter-spacing:.4px;color:#5a6b85;text-align:left;padding:6px 8px;border-bottom:2px solid #dbe4f0;background:#f4f8fd}
+.pp td{padding:6px 8px;border-bottom:1px solid #e8eef6;vertical-align:top}
+.pp .kv{display:flex;gap:8px;padding:4px 0;border-bottom:1px dotted #dfe7f1}
+.pp .kv b{flex:0 0 170px;font-size:.7rem;text-transform:uppercase;color:#5a6b85;letter-spacing:.4px}
+.pp .pt{display:inline-block;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:5px}
+.pt-expired{background:#fee2e2;color:#991b1b}.pt-amber{background:#fef3c7;color:#92600a}
+.pt-watch{background:#dbeafe;color:#1e40af}.pt-ok{background:#d1fae5;color:#065f46}
+.pp .pp-hero{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:10px;background:linear-gradient(135deg,#0b1c3a,#274b86);color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.pp .pp-hero .hava{width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-weight:900;font-size:1.3rem;overflow:hidden;flex:0 0 auto}
+.pp .pp-hero .hava img{width:100%;height:100%;object-fit:cover}
+.pp .pp-hero .hn{font-size:1.35rem;font-weight:900}
+.pp .pp-hero .hs{font-size:.74rem;opacity:.85;margin-top:3px}
+.pp .wmark{position:absolute;right:-14px;bottom:-24px;width:130px;height:130px;opacity:.14;border-radius:20px;overflow:hidden}
+.pp .wmark img{width:100%;height:100%;object-fit:cover}
+.pp .pp-foot{margin-top:26px;padding-top:12px;border-top:1px solid #e3e9f2;font-size:.66rem;color:#8a97ad;display:flex;justify-content:space-between}
+.pp .em-band{background:#b91c1c;color:#fff;font-weight:900;text-align:center;letter-spacing:2px;padding:7px;border-radius:6px;margin-bottom:14px;font-size:.8rem}
+/* ---- AMOLED pure-black theme ---- */
+body.amoled{--bg:#000;--bg2:#000;--card:#0a0a0a;--card2:#151515;--line:#1f1f1f;--line2:#2c2c2c;background:#000}
+body.amoled #bnav{background:rgba(0,0,0,.97)}
+body.amoled #sheet{background:#050505}
+body.amoled .uprow{background:#0d0d0d}
+body.amoled .searchwrap input{background:#0a0a0a}
+body.amoled #toast{background:#151515;border-color:#2c2c2c}
+body.amoled #fab{box-shadow:0 8px 22px rgba(245,183,74,.25)}
+
+@media print{
+  body>*{display:none!important}
+  body>#printWrap{display:block!important;position:static;background:#fff}
+  #printBar{display:none!important}
+  #printScroll{overflow:visible;padding:0}
+  .pp{box-shadow:none;border-radius:0;margin:0;max-width:none;padding:10mm 12mm;page-break-after:always}
+  #suiteHome{display:none!important}
+}
+@media (max-width:520px){
+  .pp{padding:22px 18px}
+  .inf-row b{flex-basis:96px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="apphead">
+    <div class="logo">PR</div>
+    <div><h1>Relations</h1><div class="sub">People · Dates · Documents</div></div>
+  </div>
+
+  <div id="view-home">
+    <div class="searchwrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" placeholder="Search people, notes, documents…" oninput="renderHome()">
+    </div>
+    <div id="pinnedWrap"></div>
+    <div id="upcomingWrap"></div>
+    <div id="groupChips" class="chips"></div>
+    <div id="contactList"></div>
+  </div>
+
+  <div id="view-groups" style="display:none"><div id="groupsArea"></div></div>
+  <div id="view-reports" style="display:none"><div id="reportsArea"></div></div>
+  <div id="view-settings" style="display:none"><div id="settingsArea"></div></div>
+</div>
+
+<button id="fab" title="Add contact" onclick="openContactForm()">+</button>
+
+<div id="bnav">
+  <button id="nav-home" class="active" onclick="nav('home')"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>People</button>
+  <button id="nav-groups" onclick="nav('groups')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Groups</button>
+  <button id="nav-reports" onclick="nav('reports')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>Reports</button>
+  <button id="nav-settings" onclick="nav('settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+</div>
+
+<div id="sheetBack" onclick="closeSheet()"></div>
+<div id="sheet"><div id="sheetGrip"><i></i></div><div id="sheetBody"></div></div>
+
+<div id="printWrap">
+  <div id="printBar">
+    <button class="btn btn-ghost btn-sm" onclick="closePrint()">‹ Back</button>
+    <div class="sp"></div>
+    <button class="btn btn-primary btn-sm" onclick="doPrint()">🖨 Print / Save PDF</button>
+  </div>
+  <div id="printScroll"><div id="printBody"></div></div>
+</div>
+
+<div id="lightbox" onclick="this.classList.remove('open')"><img id="lightImg" alt=""></div>
+<div id="toast"></div>
+
+<input type="file" id="vcfFile" accept=".vcf,text/vcard,text/x-vcard" style="display:none">
+<input type="file" id="importJsonFile" accept=".json,application/json" style="display:none">
+<input type="file" id="docFile" style="display:none">
+<input type="file" id="profPhotoFile" accept="image/*" style="display:none">
+<input type="file" id="galleryFile" accept="image/*" multiple style="display:none">
+<input type="file" id="attFile" multiple style="display:none">
+
+<script>
+/* ============================================================
+   PRM — Personal Relations Manager · Ship Suite module
+   Single-file, offline-first. Namespace: prm
+   ============================================================ */
+'use strict';
+
+/* ===== Ship Suite desktop bridge (40ms polling — iframe-safe) ===== */
+var SUITE_NS='prm';
+var DESK=null, IS_DESK=false;
+var DESK_READY=new Promise(function(res){
+  function up(){DESK=window.pywebview.api;IS_DESK=true;res(true);}
+  if(window.pywebview&&window.pywebview.api)return up();
+  var n=0;
+  var iv=setInterval(function(){
+    if(window.pywebview&&window.pywebview.api){clearInterval(iv);up();}
+    else if(++n>=23){clearInterval(iv);res(false);}
+  },40);
+  window.addEventListener('pywebviewready',function(){if(!IS_DESK&&window.pywebview&&window.pywebview.api){clearInterval(iv);up();}},{once:true});
+});
+function suiteHomeBtn(){
+  if(!IS_DESK)return;
+  var st=document.createElement('style');
+  st.textContent='#suiteHome{position:fixed;left:12px;bottom:56px;z-index:99990;padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(10,18,32,.88);color:#cfe0ff;font:600 12px/1 system-ui,sans-serif;letter-spacing:.4px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.4)}#suiteHome:hover{background:rgba(20,34,58,.95)}@media print{#suiteHome{display:none!important}}';
+  document.head.appendChild(st);
+  var b=document.createElement('button');b.id='suiteHome';b.type='button';b.title='Ship Suite home';
+  b.textContent='\u2302 Suite';
+  b.onclick=function(){location.href='index.html';};
+  document.body.appendChild(b);
+}
+
+/* ===== Utils ===== */
+const LS_KEY='prm_state_v1';
+const IDB_NAME='prm_media_v1', IDB_STORE='media';
+const COLL=['contacts','groups','dates','notes','promises','meds','appts','docs','links','places'];
+const IS_MOBILE=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+function $(id){return document.getElementById(id);}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,9);}
+function now(){return Date.now();}
+function nowIso(){return new Date().toISOString();}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function todayMid(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function parseDate(s){if(!s)return null;const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return null;return new Date(+m[1],+m[2]-1,+m[3]);}
+function fmtDate(s){const d=parseDate(s);if(!d)return '—';return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getFullYear();}
+function fmtDM(s){const d=parseDate(s);if(!d)return '—';return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];}
+function daysUntil(s){const d=parseDate(s);if(!d)return null;return Math.round((d-todayMid())/86400000);}
+function ageFrom(dob){const d=parseDate(dob);if(!d)return null;const t=new Date();let a=t.getFullYear()-d.getFullYear();const m=t.getMonth()-d.getMonth();if(m<0||(m===0&&t.getDate()<d.getDate()))a--;return a;}
+function nextOccurrence(s){ // next yearly occurrence of month/day in s → {date:Date,days:int}
+  const d=parseDate(s);if(!d)return null;
+  const t=todayMid();let occ=new Date(t.getFullYear(),d.getMonth(),d.getDate());
+  if(occ<t)occ=new Date(t.getFullYear()+1,d.getMonth(),d.getDate());
+  return {date:occ,days:Math.round((occ-t)/86400000)};
+}
+function tierFor(days){if(days==null)return null;if(days<0)return 'expired';if(days<=30)return 'amber';if(days<=90)return 'watch';return 'ok';}
+function tierLabel(days){if(days==null)return '';if(days<0)return Math.abs(days)+'d ago';if(days===0)return 'TODAY';if(days===1)return 'Tomorrow';return 'in '+days+'d';}
+function normPhone(s){const d=String(s||'').replace(/\D/g,'');return d.length>10?d.slice(-10):d;}
+function placeNavUrls(q){
+  q=(q||'').trim();
+  if(/^https?:\/\//i.test(q))return {open:q,nav:q};
+  const enc=encodeURIComponent(q);
+  return {open:'https://www.google.com/maps/search/?api=1&query='+enc,
+          nav:'https://www.google.com/maps/dir/?api=1&destination='+enc+'&travelmode=driving'};
+}
+function openExt(url){
+  if(IS_DESK&&DESK&&DESK.open_external){DESK.open_external(url).catch(()=>window.open(url,'_blank'));}
+  else window.open(url,'_blank','noopener');
+}
+async function sharePlace(label,q){
+  const u=placeNavUrls(q).open;
+  if(navigator.share){try{await navigator.share({title:label,text:label,url:u});return;}catch(e){}}
+  try{await navigator.clipboard.writeText(u);toast('Map link copied','ok');}
+  catch(e){toast(u.length>60?'Link: '+u.slice(0,60)+'\u2026':u);}
+}
+function initials(n){return String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase();}
+function nameHue(n){let h=0;for(const c of String(n||''))h=(h*31+c.charCodeAt(0))%360;return h;}
+function avaStyle(c){return 'background:linear-gradient(135deg,hsl('+nameHue(c.name)+',62%,66%),hsl('+((nameHue(c.name)+40)%360)+',62%,46%))';}
+function bytesNice(b){if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(0)+' KB';return (b/1048576).toFixed(1)+' MB';}
+let toastT=null;
+function toast(msg,kind){const t=$('toast');t.textContent=msg;t.className=kind||'';t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2400);}
+
+/* ===== State ===== */
+function blankState(){return {schemaVersion:1,contacts:[],groups:[],dates:[],notes:[],promises:[],meds:[],appts:[],docs:[],links:[],places:[],settings:{photoMaxKB:200}};}
+let state=blankState();
+async function loadState(){
+  await DESK_READY;
+  try{
+    const raw=IS_DESK?await DESK.kv_get(SUITE_NS,'state'):localStorage.getItem(LS_KEY);
+    if(raw){const p=typeof raw==='string'?JSON.parse(raw):raw;if(p&&p.contacts)state=Object.assign(blankState(),p);}
+  }catch(e){console.warn('state load failed',e);}
+  COLL.forEach(k=>{if(!Array.isArray(state[k]))state[k]=[];});
+  if(!state.settings)state.settings={photoMaxKB:200};
+}
+function save(){
+  try{
+    const j=JSON.stringify(state);
+    if(IS_DESK){DESK.kv_set(SUITE_NS,'state',j).then(r=>{if(!(r&&r.ok!==false));}).catch(()=>toast('Save failed — disk error','err'));}
+    else localStorage.setItem(LS_KEY,j);
+  }catch(e){toast('Save failed — storage unavailable','err');}
+}
+function alive(arr){return (arr||[]).filter(r=>!r.deleted);}
+function byId(arr,id){return (arr||[]).find(r=>r.id===id);}
+function contactOf(id){return byId(state.contacts,id);}
+function touch(rec){rec.modified=now();return rec;}
+
+/* ===== IndexedDB media (write durability: resolve on tx completion) ===== */
+let _idb=null;
+function idb(){
+  if(_idb)return Promise.resolve(_idb);
+  return new Promise((res,rej)=>{
+    const rq=indexedDB.open(IDB_NAME,1);
+    rq.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains(IDB_STORE)){
+        const st=db.createObjectStore(IDB_STORE,{keyPath:'id'});
+        st.createIndex('contact','contactId',{unique:false});
+      }
+    };
+    rq.onsuccess=e=>{_idb=e.target.result;res(_idb);};
+    rq.onerror=()=>rej(rq.error);
+  });
+}
+function idbPut(rec){if(IS_DESK)return DESK.media_put(SUITE_NS,rec).then(()=>{});return idb().then(db=>new Promise((res,rej)=>{const tx=db.transaction(IDB_STORE,'readwrite');tx.objectStore(IDB_STORE).put(rec);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);}));}
+function idbDel(id){if(IS_DESK)return DESK.media_del(SUITE_NS,id).then(()=>{});return idb().then(db=>new Promise((res,rej)=>{const tx=db.transaction(IDB_STORE,'readwrite');tx.objectStore(IDB_STORE).delete(id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);}));}
+function idbGet(id){
+  if(IS_DESK)return DESK.media_get?DESK.media_get(SUITE_NS,id):DESK.media_all(SUITE_NS).then(a=>(a||[]).find(m=>m.id===id)||null);
+  return idb().then(db=>new Promise((res,rej)=>{const tx=db.transaction(IDB_STORE,'readonly');const rq=tx.objectStore(IDB_STORE).get(id);rq.onsuccess=()=>res(rq.result||null);rq.onerror=()=>rej(rq.error);}));
+}
+function idbAll(){if(IS_DESK)return DESK.media_all(SUITE_NS).then(a=>a||[]);return idb().then(db=>new Promise((res,rej)=>{const out=[];const tx=db.transaction(IDB_STORE,'readonly');const rq=tx.objectStore(IDB_STORE).openCursor();rq.onsuccess=e=>{const c=e.target.result;if(c){out.push(c.value);c.continue();}else res(out);};rq.onerror=()=>rej(rq.error);}));}
+function idbClearAll(){if(IS_DESK)return DESK.media_clear(SUITE_NS).then(()=>{});return idb().then(db=>new Promise((res,rej)=>{const tx=db.transaction(IDB_STORE,'readwrite');tx.objectStore(IDB_STORE).clear();tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);}));}
+const mediaCache={};
+async function mediaUrl(id){
+  if(!id)return null;
+  if(mediaCache[id]!==undefined)return mediaCache[id];
+  const m=await idbGet(id).catch(()=>null);
+  mediaCache[id]=m?m.dataUrl:null;
+  return mediaCache[id];
+}
+
+/* ===== Image compression (photoMaxKB target) ===== */
+function fileToDataUrl(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(file);});}
+function compressImage(dataUrl,maxKB){
+  maxKB=maxKB||state.settings.photoMaxKB||200;
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      const maxSide=1400;
+      if(Math.max(w,h)>maxSide){const k=maxSide/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k);}
+      const cv=document.createElement('canvas');
+      let q=0.85,out=dataUrl;
+      for(let i=0;i<7;i++){
+        cv.width=w;cv.height=h;
+        const cx=cv.getContext('2d');cx.drawImage(img,0,0,w,h);
+        out=cv.toDataURL('image/jpeg',q);
+        if(out.length<=maxKB*1024*1.37)break;
+        if(q>0.45)q-=0.12;else{w=Math.round(w*0.82);h=Math.round(h*0.82);}
+      }
+      res(out);
+    };
+    img.onerror=()=>res(dataUrl);
+    img.src=dataUrl;
+  });
+}
+
+/* ===== Attachment rules ===== */
+const VIDEO_EXT=['mp4','mkv','avi','mov','webm','wmv','flv','3gp','m4v','mpg','mpeg'];
+const MAX_FILE_MB=5;
+function attachmentCheck(file){
+  const ext=(file.name.split('.').pop()||'').toLowerCase();
+  if((file.type||'').startsWith('video/')||VIDEO_EXT.includes(ext))
+    return 'Videos aren\u2019t stored in PRM \u2014 they belong on your pen drive, not in the database.';
+  if(!(file.type||'').startsWith('image/') && file.size>MAX_FILE_MB*1048576)
+    return 'File over '+MAX_FILE_MB+' MB \u2014 large files belong on your pen drive, not in the database.';
+  return null;
+}
+
+/* ===== Merge engine (add-if-new · newest-modified wins · soft deletes propagate) ===== */
+function mergeCollections(incoming){
+  let added=0,updated=0;
+  COLL.forEach(k=>{
+    const inc=incoming[k]||[];
+    const cur={};(state[k]||[]).forEach(r=>{if(r.id)cur[r.id]=r;});
+    inc.forEach(r=>{
+      if(!r||!r.id)return;
+      if(typeof r.deleted!=='boolean')r.deleted=false;
+      if(!r.modified)r.modified=0;
+      const ex=cur[r.id];
+      if(!ex){state[k].push(r);cur[r.id]=r;added++;}
+      else if((r.modified||0)>(ex.modified||0)){Object.assign(ex,r);updated++;}
+    });
+  });
+  return {added,updated};
+}
+function mergeMedia(media){
+  if(!Array.isArray(media)||!media.length)return Promise.resolve(0);
+  let n=0;
+  return Promise.all(media.map(m=>{
+    if(!m||!m.id)return Promise.resolve();
+    return idbGet(m.id).then(ex=>ex?null:idbPut(m).then(()=>{n++;})).catch(()=>{});
+  })).then(()=>n);
+}
+async function importPayload(data){
+  if(!data)return null;
+  const body=data.data&&data.data.contacts?data.data:(data.contacts?data:null);
+  if(!body)return null;
+  if((data.schemaVersion||body.schemaVersion||1)>1){toast('Backup from a newer PRM version \u2014 update the app first','err');return null;}
+  const rep=mergeCollections(body);
+  const mAdded=await mergeMedia(data.media||body.media).catch(()=>0);
+  save();renderAll();
+  return {added:rep.added,updated:rep.updated,media:mAdded};
+}
+
+/* ===== Export ===== */
+async function buildExport(withMedia){
+  const data={app:'PRM',schemaVersion:1,exportedAt:nowIso(),data:{}};
+  COLL.forEach(k=>data.data[k]=state[k]);
+  data.data.settings=state.settings;
+  if(withMedia)data.media=await idbAll().catch(()=>[]);
+  return data;
+}
+function downloadJson(obj,fname){
+  const blob=new Blob([JSON.stringify(obj)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+async function exportJson(withMedia){
+  const data=await buildExport(withMedia);
+  downloadJson(data,'PRM_backup_'+new Date().toISOString().slice(0,10)+(withMedia?'_with_files':'')+'.json');
+  toast('Backup exported','ok');
+}
+
+/* ===== SUITE bridge (launcher master backup/restore) ===== */
+window.SUITE={
+  async export(){return await buildExport(true);},
+  async importMerge(data){
+    const rep=await importPayload(data);
+    if(!rep)return null;
+    return {added:rep.added,updated:rep.updated,kept:0};
+  },
+  async size(){
+    let bytes=0;
+    try{bytes=new Blob([JSON.stringify(state)]).size;}catch(e){bytes=JSON.stringify(state).length;}
+    try{(await idbAll().catch(()=>[])).forEach(m=>{try{bytes+=new Blob([m.dataUrl||'']).size;}catch(e){}});}catch(e){}
+    return {bytes:bytes,records:alive(state.contacts).length};
+  }
+};
+</script>
+<script>
+/* ===== Navigation ===== */
+let currentView='home', activeGroupFilter='';
+function nav(v,noGuard){
+  currentView=v;
+  ['home','groups','reports','settings'].forEach(x=>{
+    $('view-'+x).style.display=x===v?'':'none';
+    $('nav-'+x).classList.toggle('active',x===v);
+  });
+  $('fab').style.display=v==='home'?'grid':'none';
+  if(v==='home')renderHome();
+  if(v==='groups')renderGroups();
+  if(v==='reports')renderReports();
+  if(v==='settings')renderSettings();
+  if(!noGuard)ensureGuard();
+}
+function renderAll(){nav(currentView,true);}
+
+/* ===== Upcoming events engine ===== */
+function upcomingEvents(){
+  const ev=[];
+  const cname=id=>{const c=contactOf(id);return c&&!c.deleted?c.name:null;};
+  // documents with expiry
+  alive(state.docs).forEach(d=>{
+    if(!d.expiry)return;const nm=cname(d.contactId);if(!nm)return;
+    const days=daysUntil(d.expiry);
+    const horizon=Math.max(90,d.remindDays||0);
+    if(days<=horizon){ev.push({days,tier:'t-'+tierFor(days),label:nm+' \u00b7 '+(d.title||'Document'),sub:(d.dtype||'Document')+' \u2014 '+(days<0?'EXPIRED '+fmtDate(d.expiry):'expires '+fmtDate(d.expiry)),contactId:d.contactId});}
+  });
+  // custom dates
+  alive(state.dates).forEach(dt=>{
+    const nm=cname(dt.contactId);if(!nm)return;
+    if(dt.recurring){
+      const occ=nextOccurrence(dt.date);if(!occ)return;
+      if(occ.days<=(dt.remindDays||7))ev.push({days:occ.days,tier:'t-soon',label:nm+' \u00b7 '+dt.label,sub:fmtDM(dt.date)+' every year',contactId:dt.contactId});
+    }else{
+      const days=daysUntil(dt.date);if(days==null)return;
+      const horizon=Math.max(90,dt.remindDays||0);
+      if(days<=horizon)ev.push({days,tier:'t-'+tierFor(days),label:nm+' \u00b7 '+dt.label,sub:days<0?'PASSED '+fmtDate(dt.date):'due '+fmtDate(dt.date),contactId:dt.contactId});
+    }
+  });
+  // birthdays from DOB
+  alive(state.contacts).forEach(c=>{
+    if(!c.dob)return;const occ=nextOccurrence(c.dob);if(!occ)return;
+    if(occ.days<=7){const turning=(occ.date.getFullYear()-parseDate(c.dob).getFullYear());
+      ev.push({days:occ.days,tier:'t-soon',label:c.name+' \u00b7 Birthday \ud83c\udf82',sub:fmtDM(c.dob)+' \u2014 turns '+turning,contactId:c.id});}
+  });
+  // appointments (next 30 days)
+  alive(state.appts).forEach(a=>{
+    const nm=cname(a.contactId);if(!nm)return;
+    const days=daysUntil(a.date);if(days==null||days<0||days>30)return;
+    ev.push({days,tier:'t-appt',label:nm+' \u00b7 '+(a.purpose||'Appointment'),sub:(a.doctor?a.doctor+' \u2014 ':'')+fmtDate(a.date)+(a.time?' '+a.time:''),contactId:a.contactId});
+  });
+  ev.sort((a,b)=>a.days-b.days);
+  return ev;
+}
+
+/* ===== Search ===== */
+function contactMatches(c,q){
+  if((c.name||'').toLowerCase().includes(q))return true;
+  const qd=q.replace(/\D/g,'');
+  if(qd&&(c.phones||[]).some(p=>String(p.number||'').replace(/\D/g,'').includes(qd)))return true;
+  if((c.phones||[]).some(p=>String(p.number||'').toLowerCase().includes(q)))return true;
+  if((c.emails||[]).some(e=>String(e).toLowerCase().includes(q)))return true;
+  if((c.address||'').toLowerCase().includes(q))return true;
+  if((c.custom||[]).some(f=>((f.k||'')+' '+(f.v||'')).toLowerCase().includes(q)))return true;
+  if(alive(state.notes).some(n=>n.contactId===c.id&&(n.text||'').toLowerCase().includes(q)))return true;
+  if(alive(state.docs).some(d=>d.contactId===c.id&&((d.title||'')+' '+(d.dtype||'')).toLowerCase().includes(q)))return true;
+  if(alive(state.promises).some(p=>p.contactId===c.id&&(p.text||'').toLowerCase().includes(q)))return true;
+  if(alive(state.places).some(p=>p.contactId===c.id&&((p.label||'')+' '+(p.query||'')+' '+(p.note||'')).toLowerCase().includes(q)))return true;
+  return false;
+}
+
+/* ===== Home render ===== */
+function groupTag(g){return '<span class="gtag" style="background:'+g.color+'">'+esc(g.name)+'</span>';}
+function contactRowHtml(c){
+  const gs=(c.groupIds||[]).map(id=>byId(state.groups,id)).filter(g=>g&&!g.deleted);
+  const bits=[];
+  const ph=(c.phones||[])[0];if(ph)bits.push(esc(ph.number));
+  if(c.dob){const a=ageFrom(c.dob);if(a!=null)bits.push(a+' yrs');}
+  if(gs.length)bits.push(gs.map(g=>esc(g.name)).join(', '));
+  return '<div class="crow" onclick="viewContact(\''+c.id+'\')">'
+    +'<div class="ava" data-photo="'+(c.photoId||'')+'" style="'+avaStyle(c)+'">'+esc(initials(c.name))+'</div>'
+    +'<div class="cinfo"><div class="cname">'+esc(c.name)+'</div><div class="cmeta">'+(bits.join(' \u00b7 ')||'\u2014')+'</div></div>'
+    +(c.pinned?'<svg class="pin-ic" viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2l2.9 6.6 6.6.6-5 4.4 1.5 6.4L12 16.9 6 20l1.5-6.4-5-4.4 6.6-.6z"/></svg>':'')
+    +'</div>';
+}
+async function fillAvatars(root){
+  const els=(root||document).querySelectorAll('[data-photo]');
+  for(const el of els){
+    const id=el.getAttribute('data-photo');if(!id)continue;
+    const url=await mediaUrl(id);
+    if(url)el.innerHTML='<img src="'+url+'" alt="">';
+  }
+}
+function renderHome(){
+  const q=($('q').value||'').trim().toLowerCase();
+  const all=alive(state.contacts);
+  // pinned
+  const pins=all.filter(c=>c.pinned);
+  $('pinnedWrap').innerHTML=(!q&&pins.length)?
+    '<div class="card" style="padding:11px 12px 6px"><div class="card-h"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 6.6.6-5 4.4 1.5 6.4L12 16.9 6 20l1.5-6.4-5-4.4 6.6-.6z"/></svg>Pinned</div>'
+    +'<div class="pinstrip">'+pins.map(c=>'<div class="pincell" onclick="viewContact(\''+c.id+'\')"><div class="ava" data-photo="'+(c.photoId||'')+'" style="'+avaStyle(c)+'">'+esc(initials(c.name))+'</div><span>'+esc(c.name.split(' ')[0])+'</span></div>').join('')+'</div></div>':'';
+  // upcoming
+  const ev=q?[]:upcomingEvents();
+  $('upcomingWrap').innerHTML=ev.length?
+    '<div class="card" style="padding:11px 12px 8px"><div class="card-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Upcoming <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--txt-mute)">\u00b7 '+ev.length+'</span></div>'
+    +ev.slice(0,12).map(e=>'<div class="uprow '+e.tier+'" onclick="viewContact(\''+e.contactId+'\')"><div class="upd">'+tierLabel(e.days)+'</div><div style="flex:1;min-width:0"><div class="uptxt">'+e.label+'</div><div class="upsub">'+e.sub+'</div></div></div>').join('')
+    +(ev.length>12?'<div class="hint" style="text-align:center;padding:4px">+'+(ev.length-12)+' more in Reports \u2192 Expiry register</div>':'')+'</div>':'';
+  // group chips
+  const gs=alive(state.groups);
+  $('groupChips').innerHTML=gs.length?'<button class="chip'+(activeGroupFilter?'':' on')+'" onclick="setGroupFilter(\'\')">All</button>'
+    +gs.map(g=>'<button class="chip'+(activeGroupFilter===g.id?' on':'')+'" onclick="setGroupFilter(\''+g.id+'\')"><span class="gdot" style="background:'+g.color+'"></span>'+esc(g.name)+'</button>').join(''):'';
+  // list
+  let list=all;
+  if(activeGroupFilter)list=list.filter(c=>(c.groupIds||[]).includes(activeGroupFilter));
+  if(q)list=list.filter(c=>contactMatches(c,q));
+  list.sort((a,b)=>a.name.localeCompare(b.name));
+  if(!list.length){
+    $('contactList').innerHTML='<div class="card" style="text-align:center;color:var(--txt-mute);padding:28px">'+(all.length?'No matches.':'No contacts yet.<br><br>Tap <b style="color:var(--amber)">+</b> to add one, or import your phone contacts (.vcf) from Settings.')+'</div>';
+  }else{
+    let html='',letter='';
+    list.forEach(c=>{
+      const L=(c.name[0]||'#').toUpperCase();
+      if(!q&&L!==letter){letter=L;html+='<div class="alpha-h">'+esc(L)+'</div>';}
+      html+=contactRowHtml(c);
+    });
+    $('contactList').innerHTML=html;
+  }
+  fillAvatars($('view-home'));
+}
+function setGroupFilter(id){activeGroupFilter=id;renderHome();}
+</script>
+<script>
+/* ===== Sheet ===== */
+function openSheet(html){$('sheetBody').innerHTML=html;$('sheet').classList.add('open');$('sheetBack').classList.add('open');$('sheetBody').scrollTop=0;ensureGuard();}
+function closeSheet(){$('sheet').classList.remove('open');$('sheetBack').classList.remove('open');discardStaged();}
+function sheetOpen(){return $('sheet').classList.contains('open');}
+function showLightbox(url){$('lightImg').src=url;$('lightbox').classList.add('open');}
+
+/* ===== Record attachments (notes / promises / medical) ===== */
+let attCtx=null;      // {coll,id} target when attaching to an existing record
+let stagedAtts=[];    // staged files for the note composer
+function attachTo(coll,id){attCtx={coll,id};$('attFile').value='';$('attFile').click();}
+function attachStage(){attCtx=null;$('attFile').value='';$('attFile').click();}
+async function processAttFiles(files){
+  const out=[];
+  for(const f of files){
+    const err=attachmentCheck(f);
+    if(err){toast(err,'err');continue;}
+    let dataUrl=await fileToDataUrl(f);
+    let mime=f.type||'application/octet-stream';
+    if(mime.startsWith('image/')){dataUrl=await compressImage(dataUrl);mime='image/jpeg';}
+    const mid=uid();
+    await idbPut({id:mid,contactId:curId,kind:'att',dataUrl,mime,name:f.name,ts:now()});
+    mediaCache[mid]=dataUrl;
+    out.push({mediaId:mid,mime,name:f.name});
+  }
+  return out;
+}
+async function handleAttFiles(files){
+  const atts=await processAttFiles(files);
+  if(!atts.length)return;
+  if(attCtx){
+    const rec=byId(state[attCtx.coll],attCtx.id);
+    if(rec){rec.atts=(rec.atts||[]).concat(atts);touch(rec);save();}
+    attCtx=null;
+  }else{
+    stagedAtts=stagedAtts.concat(atts);
+  }
+  renderTab();
+  toast(atts.length+' file'+(atts.length===1?'':'s')+' attached','ok');
+}
+function attCell(a,delJs){
+  return a.mime.startsWith('image/')
+    ?'<div class="ph"><img data-att="'+a.mediaId+'" onclick="viewAtt(\''+a.mediaId+'\',\''+a.mime+'\',\''+esc(a.name)+'\')" alt=""><button onclick="'+delJs+'">\u00d7</button></div>'
+    :'<div class="ph" style="width:auto;min-width:64px"><div style="height:100%;display:flex;align-items:center;justify-content:center;padding:0 9px;font-size:.6rem;font-weight:800;color:var(--txt-dim);cursor:pointer" onclick="viewAtt(\''+a.mediaId+'\',\''+a.mime+'\',\''+esc(a.name)+'\')">'+esc((a.name||'FILE').split('.').pop().toUpperCase())+'</div><button onclick="'+delJs+'">\u00d7</button></div>';
+}
+function attStripHtml(rec,coll){
+  const atts=rec.atts||[];if(!atts.length)return '';
+  return '<div class="photo-strip" style="margin-top:7px">'+atts.map((a,i)=>attCell(a,'delAtt(\''+coll+'\',\''+rec.id+'\','+i+')')).join('')+'</div>';
+}
+function stagedStripHtml(){
+  if(!stagedAtts.length)return '';
+  return '<div class="photo-strip" style="margin:0 0 9px">'+stagedAtts.map((a,i)=>attCell(a,'delStaged('+i+')')).join('')+'</div>';
+}
+async function fillAttThumbs(){
+  for(const el of document.querySelectorAll('img[data-att]')){
+    const u=await mediaUrl(el.getAttribute('data-att'));
+    if(u)el.src=u;
+  }
+}
+async function viewAtt(mid,mime,name){
+  const u=await mediaUrl(mid);
+  if(!u){toast('File data missing','err');return;}
+  if((mime||'').startsWith('image/'))showLightbox(u);
+  else{const a=document.createElement('a');a.href=u;a.download=name||'file';a.click();toast('Downloading '+(name||'file'));}
+}
+function delAtt(coll,id,idx){
+  const rec=byId(state[coll],id);if(!rec||!rec.atts)return;
+  const rm=rec.atts.splice(idx,1)[0];
+  if(rm){idbDel(rm.mediaId).catch(()=>{});delete mediaCache[rm.mediaId];}
+  touch(rec);save();renderTab();
+}
+function delStaged(i){
+  const rm=stagedAtts.splice(i,1)[0];
+  if(rm){idbDel(rm.mediaId).catch(()=>{});delete mediaCache[rm.mediaId];}
+  renderTab();
+}
+function discardStaged(){
+  while(stagedAtts.length){
+    const a=stagedAtts.pop();
+    idbDel(a.mediaId).catch(()=>{});delete mediaCache[a.mediaId];
+  }
+}
+
+/* ===== Contact form ===== */
+let formPhotoDataUrl=null, formPhotoRemoved=false;
+function dynPhoneRow(p){p=p||{label:'Mobile',number:''};
+  return '<div class="dyn-row" data-kind="phone"><select style="flex:0 0 108px">'+['Mobile','Home','Work','Other'].map(l=>'<option'+(p.label===l?' selected':'')+'>'+l+'</option>').join('')+'</select><input placeholder="Phone number" value="'+esc(p.number)+'"><button class="rm" onclick="this.parentNode.remove()">\u00d7</button></div>';}
+function dynEmailRow(v){return '<div class="dyn-row" data-kind="email"><input placeholder="Email address" value="'+esc(v||'')+'"><button class="rm" onclick="this.parentNode.remove()">\u00d7</button></div>';}
+function dynCustomRow(f){f=f||{k:'',v:''};
+  return '<div class="dyn-row" data-kind="custom"><input placeholder="Field (e.g. Passport No.)" style="flex:0 0 44%" value="'+esc(f.k)+'"><input placeholder="Value" value="'+esc(f.v)+'"><button class="rm" onclick="this.parentNode.remove()">\u00d7</button></div>';}
+function addDyn(wrapId,html){const d=document.createElement('div');d.innerHTML=html;$(wrapId).appendChild(d.firstChild);}
+
+function openContactForm(id){
+  const c=id?contactOf(id):null;
+  formPhotoDataUrl=null;formPhotoRemoved=false;
+  const gs=alive(state.groups);
+  openSheet(
+    '<h2>'+(c?'Edit contact':'New contact')+'</h2><p class="sheet-sub">Only the name is required \u2014 everything else is optional.</p>'
+    +'<div style="display:flex;gap:14px;align-items:center;margin-bottom:14px">'
+    +'<div class="ava" id="cf_ava" style="width:64px;height:64px;border-radius:18px;font-size:1.3rem;'+(c?avaStyle(c):'')+'" data-photo="'+(c&&c.photoId||'')+'">'+(c?esc(initials(c.name)):'\ud83d\udc64')+'</div>'
+    +'<div><button class="btn btn-ghost btn-sm" onclick="$(\'profPhotoFile\').click()">\ud83d\udcf7 '+(c&&c.photoId?'Change photo':'Add photo')+'</button>'
+    +(c&&c.photoId?' <button class="btn btn-ghost btn-sm" onclick="formPhotoRemoved=true;formPhotoDataUrl=null;$(\'cf_ava\').innerHTML=\'\ud83d\udc64\';toast(\'Photo will be removed\')">Remove</button>':'')+'</div></div>'
+    +'<div class="field"><label>Name *</label><input id="cf_name" value="'+esc(c?c.name:'')+'" placeholder="Full name"></div>'
+    +'<div class="field"><label>Phone numbers</label><div id="cf_phones">'+((c&&c.phones||[]).map(dynPhoneRow).join('')||dynPhoneRow())+'</div><button class="addline" onclick="addDyn(\'cf_phones\',dynPhoneRow())">+ Add phone</button></div>'
+    +'<div class="field"><label>Email IDs</label><div id="cf_emails">'+((c&&c.emails||[]).map(dynEmailRow).join('')||'')+'</div><button class="addline" onclick="addDyn(\'cf_emails\',dynEmailRow())">+ Add email</button></div>'
+    +'<div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>Date of birth</label><input type="date" id="cf_dob" value="'+esc(c&&c.dob||'')+'"></div>'
+    +'<div class="field" style="flex:0 0 34%"><label>Blood group</label><select id="cf_blood">'+['','A+','A-','B+','B-','AB+','AB-','O+','O-'].map(b=>'<option'+((c&&c.bloodGroup)===b?' selected':'')+'>'+b+'</option>').join('')+'</select></div></div>'
+    +'<div class="field"><label>Allergies / medical alerts</label><input id="cf_allergies" value="'+esc(c&&c.allergies||'')+'" placeholder="e.g. Penicillin, peanuts"></div>'
+    +'<div class="field"><label>Address</label><textarea id="cf_address" style="min-height:56px">'+esc(c&&c.address||'')+'</textarea></div>'
+    +'<div class="field"><label>Other things to remember</label><div id="cf_custom">'+((c&&c.custom||[]).map(dynCustomRow).join('')||'')+'</div><button class="addline" onclick="addDyn(\'cf_custom\',dynCustomRow())">+ Add field</button></div>'
+    +(gs.length?'<div class="field"><label>Groups</label><div class="chips" id="cf_groups">'+gs.map(g=>'<button class="chip'+((c&&c.groupIds||[]).includes(g.id)?' on':'')+'" data-gid="'+g.id+'" onclick="this.classList.toggle(\'on\')"><span class="gdot" style="background:'+g.color+'"></span>'+esc(g.name)+'</button>').join('')+'</div></div>':'')
+    +'<button class="btn btn-primary btn-block" style="margin-top:6px" onclick="saveContact(\''+(c?c.id:'')+'\')">Save contact</button>'
+    +(c?'<button class="btn btn-danger btn-block" style="margin-top:10px" onclick="deleteContact(\''+c.id+'\')">Move to trash</button>':'')
+  );
+  fillAvatars($('sheetBody'));
+}
+function collectDyn(wrapId,kind){
+  const out=[];
+  ($(wrapId)?$(wrapId).querySelectorAll('.dyn-row[data-kind='+kind+']'):[]).forEach(r=>{
+    const ins=r.querySelectorAll('input,select');
+    if(kind==='phone'){const num=ins[1].value.trim();if(num)out.push({label:ins[0].value,number:num});}
+    else if(kind==='email'){const v=ins[0].value.trim();if(v)out.push(v);}
+    else{const k=ins[0].value.trim(),v=ins[1].value.trim();if(k||v)out.push({k,v});}
+  });
+  return out;
+}
+async function saveContact(id){
+  const name=$('cf_name').value.trim();
+  if(!name){toast('Name is required','err');return;}
+  let c=id?contactOf(id):null;
+  if(!c){c={id:uid(),created:now(),deleted:false,pinned:false,groupIds:[],photoId:null};state.contacts.push(c);}
+  c.name=name;
+  c.phones=collectDyn('cf_phones','phone');
+  c.emails=collectDyn('cf_emails','email');
+  c.custom=collectDyn('cf_custom','custom');
+  c.dob=$('cf_dob').value||'';
+  c.bloodGroup=$('cf_blood').value||'';
+  c.allergies=$('cf_allergies').value.trim();
+  c.address=$('cf_address').value.trim();
+  const gw=$('cf_groups');
+  if(gw)c.groupIds=[...gw.querySelectorAll('.chip.on')].map(b=>b.getAttribute('data-gid'));
+  if(formPhotoRemoved&&c.photoId){idbDel(c.photoId).catch(()=>{});delete mediaCache[c.photoId];c.photoId=null;}
+  if(formPhotoDataUrl){
+    const mid=c.photoId||uid();
+    await idbPut({id:mid,contactId:c.id,kind:'profile',dataUrl:formPhotoDataUrl,mime:'image/jpeg',name:'profile.jpg',ts:now()});
+    mediaCache[mid]=formPhotoDataUrl;c.photoId=mid;
+  }
+  touch(c);save();closeSheet();renderAll();
+  toast(id?'Contact updated':'Contact added','ok');
+}
+function deleteContact(id){
+  const c=contactOf(id);if(!c)return;
+  if(!confirm('Move '+c.name+' to trash? You can restore from Settings \u2192 Trash.'))return;
+  c.deleted=true;touch(c);save();closeSheet();renderAll();toast('Moved to trash');
+}
+function togglePin(id){const c=contactOf(id);if(!c)return;c.pinned=!c.pinned;touch(c);save();viewContact(id);renderHome();}
+
+/* ===== Profile view ===== */
+let curId=null, curTab='info';
+function counts(id){
+  return {
+    notes:alive(state.notes).filter(n=>n.contactId===id).length,
+    proms:alive(state.promises).filter(p=>p.contactId===id&&!p.done).length,
+    meds:alive(state.meds).filter(m=>m.contactId===id).length+alive(state.appts).filter(a=>a.contactId===id).length,
+    docs:alive(state.docs).filter(d=>d.contactId===id).length,
+    links:alive(state.links).filter(l=>l.aId===id||l.bId===id).length
+  };
+}
+function viewContact(id,tab){
+  const c=contactOf(id);if(!c||c.deleted)return;
+  curId=id;curTab=tab||'info';
+  const gs=(c.groupIds||[]).map(g=>byId(state.groups,g)).filter(g=>g&&!g.deleted);
+  const n=counts(id);
+  const ph=(c.phones||[])[0], em=(c.emails||[])[0];
+  const qa=(IS_MOBILE&&!IS_DESK)?('<div class="qacts">'
+    +(ph?'<a href="tel:'+esc(ph.number.replace(/\s/g,''))+'"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call</a>':'')
+    +(ph?'<a href="https://wa.me/'+ph.number.replace(/\D/g,'')+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></svg>WhatsApp</a>':'')
+    +(em?'<a href="mailto:'+esc(em)+'"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="m22 6-10 7L2 6"/></svg>Email</a>':'')
+    +'</div>'):'';
+  openSheet(
+    '<div class="prof-head">'
+    +'<div class="ava" data-photo="'+(c.photoId||'')+'" style="'+avaStyle(c)+'" '+(c.photoId?'onclick="mediaUrl(\''+c.photoId+'\').then(u=>u&&showLightbox(u))"':'')+'>'+esc(initials(c.name))+'</div>'
+    +'<div style="flex:1;min-width:0"><div class="pn">'+esc(c.name)+'</div>'
+    +'<div class="pr">'+[c.dob?fmtDate(c.dob)+(ageFrom(c.dob)!=null?' \u00b7 '+ageFrom(c.dob)+' yrs':''):'',c.bloodGroup?'\ud83e\ude78 '+esc(c.bloodGroup):''].filter(Boolean).join(' \u00b7 ')+'</div>'
+    +'<div>'+gs.map(groupTag).join('')+'</div></div>'
+    +'<button class="icon-btn" title="'+(c.pinned?'Unpin':'Pin')+'" onclick="togglePin(\''+id+'\')"><svg viewBox="0 0 24 24" '+(c.pinned?'fill="#f5b74a" stroke="#f5b74a"':'fill="none"')+'><path d="M12 2l2.9 6.6 6.6.6-5 4.4 1.5 6.4L12 16.9 6 20l1.5-6.4-5-4.4 6.6-.6z"/></svg></button>'
+    +'<button class="icon-btn" title="Edit" onclick="openContactForm(\''+id+'\')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>'
+    +'</div>'
+    +qa
+    +'<div class="ptabs">'
+    +[['info','Info',''],['notes','Notes',n.notes],['proms','Promises',n.proms],['med','Medical',n.meds],['docs','Docs',n.docs],['links','Links',n.links]]
+      .map(t=>'<button class="ptab'+(curTab===t[0]?' active':'')+'" onclick="viewContact(\''+id+'\',\''+t[0]+'\')">'+t[1]+(t[2]?'<span class="pill">'+t[2]+'</span>':'')+'</button>').join('')
+    +'</div><div id="ptabBody"></div>'
+  );
+  renderTab();
+  fillAvatars($('sheetBody'));
+}
+function renderTab(){
+  const b=$('ptabBody');if(!b||!curId)return;
+  if(curTab!=='notes')discardStaged();
+  if(curTab==='info')b.innerHTML=tabInfo();
+  else if(curTab==='notes'){b.innerHTML=tabNotes();fillAttThumbs();}
+  else if(curTab==='proms'){b.innerHTML=tabPromises();fillAttThumbs();}
+  else if(curTab==='med'){b.innerHTML=tabMedical();fillAttThumbs();}
+  else if(curTab==='docs'){b.innerHTML=tabDocs();fillDocThumbs();}
+  else if(curTab==='links')b.innerHTML=tabLinks();
+}
+
+/* ---- Info tab (fields + important dates) ---- */
+function tabInfo(){
+  const c=contactOf(curId);
+  const rows=[];
+  (c.phones||[]).forEach(p=>rows.push(['\u260e '+p.label,esc(p.number)]));
+  (c.emails||[]).forEach(e=>rows.push(['\u2709 Email',esc(e)]));
+  if(c.dob)rows.push(['Birthday',fmtDate(c.dob)+(ageFrom(c.dob)!=null?' ('+ageFrom(c.dob)+' yrs)':'')]);
+  if(c.bloodGroup)rows.push(['Blood group',esc(c.bloodGroup)]);
+  if(c.allergies)rows.push(['Allergies',esc(c.allergies)]);
+  if(c.address)rows.push(['Address',esc(c.address).replace(/\n/g,'<br>')+' <button class="mini-del" style="color:var(--navy2)" title="Navigate" onclick="openExt(placeNavUrls('+JSON.stringify(c.address).replace(/"/g,'&quot;')+').nav)">\ud83e\udded Navigate</button>']);
+  (c.custom||[]).forEach(f=>rows.push([esc(f.k),esc(f.v)]));
+  const dates=alive(state.dates).filter(d=>d.contactId===curId);
+  const places=alive(state.places).filter(p=>p.contactId===curId);
+  return (rows.length?rows.map(r=>'<div class="inf-row"><b>'+r[0]+'</b><span>'+r[1]+'</span></div>').join(''):'<div class="hint" style="padding:8px 2px">No details yet \u2014 tap the pencil to add.</div>')
+    +'<div class="card-h" style="margin-top:16px"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Places</div>'
+    +(places.map(p=>'<div class="file-row"><div class="file-info"><div class="file-name">'+esc(p.label)+' <span class="tier-badge tb-watch">'+esc(p.tag||'Other')+'</span></div><div class="file-meta">'+esc((p.query||'').length>64?(p.query.slice(0,64)+'\u2026'):p.query)+(p.note?'<br>'+esc(p.note):'')+'</div></div>'
+      +'<div class="file-acts">'
+      +'<button class="icon-btn" title="Open in Maps" onclick="openExt(placeNavUrls(byId(state.places,\''+p.id+'\').query).open)"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></button>'
+      +'<button class="icon-btn" title="Navigate" onclick="openExt(placeNavUrls(byId(state.places,\''+p.id+'\').query).nav)"><svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></button>'
+      +'<button class="icon-btn" title="Edit" onclick="openPlaceForm(\''+p.id+'\')"><svg viewBox="0 0 24 24"><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>'
+      +'</div></div>').join('')||'<div class="hint">Their home, workplace, favourite spots, places to visit together \u2014 each opens in Google Maps for one-tap navigation.</div>')
+    +'<button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="openPlaceForm()">+ Add place</button>'
+    +'<div class="card-h" style="margin-top:16px"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Important dates</div>'
+    +(dates.map(d=>{
+      const info=d.recurring?fmtDM(d.date)+' every year':fmtDate(d.date);
+      const days=d.recurring?(nextOccurrence(d.date)||{}).days:daysUntil(d.date);
+      const tier=d.recurring?'ok':tierFor(days);
+      return '<div class="file-row"><div class="file-info"><div class="file-name">'+esc(d.label)+'</div><div class="file-meta">'+info+' \u00b7 remind '+(d.remindDays||7)+'d ahead</div></div>'
+        +'<span class="tier-badge tb-'+(tier||'ok')+'">'+tierLabel(days)+'</span>'
+        +'<div class="file-acts"><button class="icon-btn" onclick="openDateForm(\''+d.id+'\')" title="Edit"><svg viewBox="0 0 24 24"><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button></div></div>';
+    }).join('')||'<div class="hint">Anniversaries, premiums, visa renewals \u2014 they all feed the Upcoming strip.</div>')
+    +'<button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="openDateForm()">+ Add date</button>';
+}
+function openDateForm(id){
+  const d=id?byId(state.dates,id):null;
+  openSheet('<h2>'+(d?'Edit date':'Add important date')+'</h2><p class="sheet-sub">For '+esc(contactOf(curId).name)+'</p>'
+    +'<div class="field"><label>What is it?</label><input id="df_label" value="'+esc(d&&d.label||'')+'" placeholder="e.g. Wedding anniversary, LIC premium, Visa expiry"></div>'
+    +'<div class="field"><label>Date</label><input type="date" id="df_date" value="'+esc(d&&d.date||'')+'"></div>'
+    +'<div class="field"><label><input type="checkbox" id="df_rec" style="width:auto;margin-right:7px;accent-color:var(--amber)" '+(d&&d.recurring?'checked':'')+'>Repeats every year (birthday / anniversary style)</label></div>'
+    +'<div class="field"><label>Remind me ahead (days)</label><input type="number" id="df_remind" value="'+(d?(d.remindDays||7):7)+'" min="0" max="365"><div class="hint">Recurring dates default 7 days; one-time deadlines default 30.</div></div>'
+    +'<button class="btn btn-primary btn-block" onclick="saveDate(\''+(d?d.id:'')+'\')">Save</button>'
+    +(d?'<button class="btn btn-danger btn-block" style="margin-top:10px" onclick="delRec(\'dates\',\''+d.id+'\')">Delete</button>':''));
+  const rec=$('df_rec');
+  rec.addEventListener('change',()=>{$('df_remind').value=rec.checked?7:30;});
+  if(!d)$('df_remind').value=30;
+}
+function saveDate(id){
+  const label=$('df_label').value.trim(), date=$('df_date').value;
+  if(!label||!date){toast('Label and date required','err');return;}
+  let d=id?byId(state.dates,id):null;
+  if(!d){d={id:uid(),contactId:curId,created:now(),deleted:false};state.dates.push(d);}
+  d.label=label;d.date=date;d.recurring=$('df_rec').checked;d.remindDays=parseInt($('df_remind').value)||7;
+  touch(d);save();viewContact(curId,'info');renderHome();toast('Saved','ok');
+}
+function delRec(coll,id){
+  const r=byId(state[coll],id);if(!r)return;
+  if(r.atts)r.atts.forEach(a=>{idbDel(a.mediaId).catch(()=>{});delete mediaCache[a.mediaId];});
+  r.deleted=true;touch(r);save();
+  if(sheetOpen()&&curId)viewContact(curId,curTab);
+  renderHome();toast('Deleted');
+}
+
+const PLACE_TAGS=['Home','Work','Favourite','To visit together','Other'];
+function openPlaceForm(id){
+  const p=id?byId(state.places,id):null;
+  openSheet('<h2>'+(p?'Edit place':'Add place')+'</h2><p class="sheet-sub">For '+esc(contactOf(curId).name)+'</p>'
+    +'<div class="field"><label>Name *</label><input id="pl_label" value="'+esc(p&&p.label||'')+'" placeholder="e.g. Their home, Favourite beach, Native village"></div>'
+    +'<div class="field"><label>Location *</label><input id="pl_query" value="'+esc(p&&p.query||'')+'" placeholder="Address, or 11.93, 79.83, or a Google Maps link">'
+    +'<div class="hint">Paste any of: a written address \u00b7 coordinates (lat, long) \u00b7 a shared Google Maps link. All three navigate correctly.</div></div>'
+    +'<div class="field"><label>Tag</label><select id="pl_tag">'+PLACE_TAGS.map(t=>'<option'+((p&&p.tag)===t?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'
+    +'<div class="field"><label>Note</label><input id="pl_note" value="'+esc(p&&p.note||'')+'" placeholder="e.g. Parking behind the temple"></div>'
+    +'<button class="btn btn-primary btn-block" onclick="savePlace(\''+(p?p.id:'')+'\')">Save place</button>'
+    +(p?'<div style="display:flex;gap:10px;margin-top:10px"><button class="btn btn-ghost btn-sm" style="flex:1" onclick="sharePlace(\''+esc(p.label).replace(/'/g,'\\\'')+'\',byId(state.places,\''+p.id+'\').query)">\ud83d\udd17 Share link</button>'
+      +'<button class="btn btn-danger btn-sm" style="flex:1" onclick="delRec(\'places\',\''+p.id+'\')">Delete</button></div>':''));
+}
+function savePlace(id){
+  const label=$('pl_label').value.trim(), query=$('pl_query').value.trim();
+  if(!label||!query){toast('Name and location required','err');return;}
+  let p=id?byId(state.places,id):null;
+  if(!p){p={id:uid(),contactId:curId,created:now(),deleted:false};state.places.push(p);}
+  p.label=label;p.query=query;p.tag=$('pl_tag').value;p.note=$('pl_note').value.trim();
+  touch(p);save();viewContact(curId,'info');toast('Place saved','ok');
+}
+
+/* ---- Notes tab (append-only, newest pinned) ---- */
+function tabNotes(){
+  const notes=alive(state.notes).filter(n=>n.contactId===curId).sort((a,b)=>b.ts-a.ts);
+  return '<div class="field"><textarea id="nt_text" placeholder="Point to remember about '+esc(contactOf(curId).name.split(' ')[0])+'\u2026" style="min-height:64px"></textarea></div>'
+    +stagedStripHtml()
+    +'<div style="display:flex;gap:8px"><button class="btn btn-accent btn-sm" onclick="addNote()">Add note</button>'
+    +'<button class="btn btn-ghost btn-sm" onclick="attachStage()">\ud83d\udcce Photo / file</button></div><div style="height:12px"></div>'
+    +(notes.map((n,i)=>'<div class="note-card'+(i===0?' newest':'')+'"><div class="note-ts"><span>'+(i===0?'\u2b50 LATEST \u00b7 ':'')+new Date(n.ts).toLocaleString()+'</span><span><button class="mini-del" title="Attach" onclick="attachTo(\'notes\',\''+n.id+'\')">\ud83d\udcce</button> <button class="mini-del" onclick="delRec(\'notes\',\''+n.id+'\')">delete</button></span></div>'+(n.text?'<div class="note-tx">'+esc(n.text)+'</div>':'')+attStripHtml(n,'notes')+'</div>').join('')
+      ||'<div class="hint">Notes stack up over time \u2014 the newest stays highlighted on top. Attach photos or files to any note.</div>');
+}
+function addNote(){
+  const t=$('nt_text').value.trim();
+  if(!t&&!stagedAtts.length){toast('Write something or attach a file first','err');return;}
+  const rec={id:uid(),contactId:curId,text:t,ts:now(),created:now(),deleted:false};
+  if(stagedAtts.length){rec.atts=stagedAtts.slice();stagedAtts=[];}
+  state.notes.push(touch(rec));
+  save();viewContact(curId,'notes');toast('Note added','ok');
+}
+
+/* ---- Promises & gifts tab ---- */
+function tabPromises(){
+  const ps=alive(state.promises).filter(p=>p.contactId===curId);
+  const open=ps.filter(p=>!p.done).sort((a,b)=>b.ts-a.ts), done=ps.filter(p=>p.done).sort((a,b)=>(b.doneTs||0)-(a.doneTs||0));
+  const row=p=>'<div class="prom-row"><input type="checkbox" '+(p.done?'checked':'')+' onchange="togglePromise(\''+p.id+'\')"><div style="flex:1;min-width:0"><div class="prom-tx'+(p.done?' done':'')+'">'+esc(p.text)+'</div><div class="prom-ts">'+new Date(p.ts).toLocaleDateString()+(p.done&&p.doneTs?' \u2192 done '+new Date(p.doneTs).toLocaleDateString():'')+'</div>'+attStripHtml(p,'promises')+'</div><button class="mini-del" title="Attach" onclick="attachTo(\'promises\',\''+p.id+'\')">\ud83d\udcce</button><button class="mini-del" onclick="delRec(\'promises\',\''+p.id+'\')">\u00d7</button></div>';
+  return '<div class="field"><input id="pr_text" placeholder="Promised a watch \u00b7 owes me \u20b95000 \u00b7 return his book\u2026"></div>'
+    +'<button class="btn btn-accent btn-sm" onclick="addPromise()">Add promise / gift</button><div style="height:10px"></div>'
+    +(open.length?'<div class="card-h">Open \u00b7 '+open.length+'</div>'+open.map(row).join(''):'')
+    +(done.length?'<div class="card-h" style="margin-top:14px">Done \u00b7 '+done.length+'</div>'+done.map(row).join(''):'')
+    +(!ps.length?'<div class="hint">Sailor-brain insurance: promises, gifts, borrowings \u2014 tick them off when settled.</div>':'');
+}
+function addPromise(){
+  const t=$('pr_text').value.trim();if(!t){toast('Write something first','err');return;}
+  state.promises.push(touch({id:uid(),contactId:curId,text:t,ts:now(),done:false,created:now(),deleted:false}));
+  save();viewContact(curId,'proms');toast('Added','ok');
+}
+function togglePromise(id){
+  const p=byId(state.promises,id);if(!p)return;
+  p.done=!p.done;p.doneTs=p.done?now():null;touch(p);save();viewContact(curId,'proms');
+}
+
+/* ---- Medical tab ---- */
+function tabMedical(){
+  const meds=alive(state.meds).filter(m=>m.contactId===curId);
+  const appts=alive(state.appts).filter(a=>a.contactId===curId);
+  const fut=appts.filter(a=>{const d=daysUntil(a.date);return d!=null&&d>=0;}).sort((a,b)=>a.date.localeCompare(b.date));
+  const past=appts.filter(a=>{const d=daysUntil(a.date);return d==null||d<0;}).sort((a,b)=>b.date.localeCompare(a.date));
+  const mfiles=alive(state.docs).filter(d=>d.contactId===curId&&d.dtype==='Medical report');
+  const apRow=a=>'<div class="file-row"><div class="file-info"><div class="file-name">'+esc(a.purpose||'Appointment')+'</div><div class="file-meta">'+fmtDate(a.date)+(a.time?' \u00b7 '+esc(a.time):'')+(a.doctor?' \u00b7 '+esc(a.doctor):'')+(a.notes?'<br>'+esc(a.notes):'')+'</div>'+attStripHtml(a,'appts')+'</div><div class="file-acts"><button class="icon-btn" title="Attach" onclick="attachTo(\'appts\',\''+a.id+'\')"><svg viewBox="0 0 24 24"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l8.57-8.57a4 4 0 1 1 5.66 5.66l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button><button class="icon-btn" onclick="openApptForm(\''+a.id+'\')"><svg viewBox="0 0 24 24"><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button></div></div>';
+  return '<div class="card-h"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>Medications</div>'
+    +(meds.map(m=>'<div class="file-row"><div class="file-info"><div class="file-name">'+esc(m.name)+(m.active===false?' <span class="tier-badge tb-watch">STOPPED</span>':'')+'</div><div class="file-meta">'+esc(m.dose||'')+(m.notes?' \u00b7 '+esc(m.notes):'')+'</div>'+attStripHtml(m,'meds')+'</div>'
+      +'<div class="file-acts"><button class="icon-btn" title="Attach" onclick="attachTo(\'meds\',\''+m.id+'\')"><svg viewBox="0 0 24 24"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l8.57-8.57a4 4 0 1 1 5.66 5.66l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button><button class="icon-btn" title="'+(m.active===false?'Resume':'Stop')+'" onclick="toggleMed(\''+m.id+'\')"><svg viewBox="0 0 24 24">'+(m.active===false?'<path d="M5 3l14 9-14 9z"/>':'<rect x="6" y="6" width="12" height="12" rx="2"/>')+'</svg></button>'
+      +'<button class="icon-btn" onclick="delRec(\'meds\',\''+m.id+'\')"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m1 0v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6"/></svg></button></div></div>').join('')||'<div class="hint">No medications recorded.</div>')
+    +'<button class="btn btn-ghost btn-sm" style="margin:8px 0 16px" onclick="openMedForm()">+ Add medication</button>'
+    +'<div class="card-h"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Doctor appointments</div>'
+    +(fut.map(apRow).join('')||'<div class="hint">No upcoming appointments.</div>')
+    +'<button class="btn btn-ghost btn-sm" style="margin:8px 0 6px" onclick="openApptForm()">+ Add appointment</button>'
+    +(past.length?'<div class="card-h" style="margin-top:12px">Visit history \u00b7 '+past.length+'</div>'+past.slice(0,10).map(apRow).join(''):'')
+    +'<div class="card-h" style="margin-top:16px"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Medical files</div>'
+    +(mfiles.map(docRowHtml).join('')||'<div class="hint">Prescriptions, lab reports \u2014 add via the Docs tab with type \u201cMedical report\u201d, or here:</div>')
+    +'<button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="openDocForm(null,\'Medical report\')">+ Add medical file</button>';
+}
+function openMedForm(id){
+  const m=id?byId(state.meds,id):null;
+  openSheet('<h2>'+(m?'Edit medication':'Add medication')+'</h2><p class="sheet-sub">For '+esc(contactOf(curId).name)+'</p>'
+    +'<div class="field"><label>Medicine *</label><input id="md_name" value="'+esc(m&&m.name||'')+'" placeholder="e.g. Metformin 500 mg"></div>'
+    +'<div class="field"><label>Dose / schedule</label><input id="md_dose" value="'+esc(m&&m.dose||'')+'" placeholder="e.g. 1-0-1 after food"></div>'
+    +'<div class="field"><label>Notes</label><input id="md_notes" value="'+esc(m&&m.notes||'')+'"></div>'
+    +'<button class="btn btn-primary btn-block" onclick="saveMed(\''+(m?m.id:'')+'\')">Save</button>');
+}
+function saveMed(id){
+  const name=$('md_name').value.trim();if(!name){toast('Medicine name required','err');return;}
+  let m=id?byId(state.meds,id):null;
+  if(!m){m={id:uid(),contactId:curId,active:true,created:now(),deleted:false};state.meds.push(m);}
+  m.name=name;m.dose=$('md_dose').value.trim();m.notes=$('md_notes').value.trim();
+  touch(m);save();viewContact(curId,'med');toast('Saved','ok');
+}
+function toggleMed(id){const m=byId(state.meds,id);if(!m)return;m.active=m.active===false;touch(m);save();viewContact(curId,'med');}
+function openApptForm(id){
+  const a=id?byId(state.appts,id):null;
+  openSheet('<h2>'+(a?'Edit appointment':'Add appointment')+'</h2><p class="sheet-sub">For '+esc(contactOf(curId).name)+' \u2014 past dates become visit history automatically.</p>'
+    +'<div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>Date *</label><input type="date" id="ap_date" value="'+esc(a&&a.date||'')+'"></div>'
+    +'<div class="field" style="flex:0 0 34%"><label>Time</label><input type="time" id="ap_time" value="'+esc(a&&a.time||'')+'"></div></div>'
+    +'<div class="field"><label>Doctor / clinic</label><input id="ap_doctor" value="'+esc(a&&a.doctor||'')+'" placeholder="e.g. Dr. Ramesh, JIPMER"></div>'
+    +'<div class="field"><label>Purpose</label><input id="ap_purpose" value="'+esc(a&&a.purpose||'')+'" placeholder="e.g. Diabetes review"></div>'
+    +'<div class="field"><label>Notes / outcome</label><textarea id="ap_notes" style="min-height:56px">'+esc(a&&a.notes||'')+'</textarea></div>'
+    +'<button class="btn btn-primary btn-block" onclick="saveAppt(\''+(a?a.id:'')+'\')">Save</button>'
+    +(a?'<button class="btn btn-danger btn-block" style="margin-top:10px" onclick="delRec(\'appts\',\''+a.id+'\')">Delete</button>':''));
+}
+function saveAppt(id){
+  const date=$('ap_date').value;if(!date){toast('Date required','err');return;}
+  let a=id?byId(state.appts,id):null;
+  if(!a){a={id:uid(),contactId:curId,created:now(),deleted:false};state.appts.push(a);}
+  a.date=date;a.time=$('ap_time').value;a.doctor=$('ap_doctor').value.trim();a.purpose=$('ap_purpose').value.trim();a.notes=$('ap_notes').value.trim();
+  touch(a);save();viewContact(curId,'med');renderHome();toast('Saved','ok');
+}
+</script>
+<script>
+/* ---- Documents tab ---- */
+const DOC_TYPES=['Passport','Aadhaar','PAN','Visa','Policy','Licence','Certificate','Medical report','Other'];
+function docRowHtml(d){
+  const days=d.expiry?daysUntil(d.expiry):null;
+  const tier=d.expiry?tierFor(days):null;
+  return '<div class="file-row"><div class="file-thumb" data-doc="'+d.id+'">'+(d.mime&&d.mime.startsWith('image/')?'\ud83d\uddbc':(d.mime==='application/pdf'?'PDF':'FILE'))+'</div>'
+    +'<div class="file-info" style="cursor:pointer" onclick="viewDoc(\''+d.id+'\')"><div class="file-name">'+esc(d.title||d.fname||'Document')+'</div>'
+    +'<div class="file-meta">'+esc(d.dtype||'Other')+(d.size?' \u00b7 '+bytesNice(d.size):'')+(d.expiry?' \u00b7 expires '+fmtDate(d.expiry):'')+'</div></div>'
+    +(tier?'<span class="tier-badge tb-'+tier+'">'+(tier==='expired'?'EXPIRED':tierLabel(days))+'</span>':'')
+    +'<div class="file-acts"><button class="icon-btn" title="Edit" onclick="openDocMeta(\''+d.id+'\')"><svg viewBox="0 0 24 24"><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>'
+    +'<button class="icon-btn" title="Delete" onclick="delDoc(\''+d.id+'\')"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m1 0v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6"/></svg></button></div></div>';
+}
+function tabDocs(){
+  const c=contactOf(curId);
+  const docs=alive(state.docs).filter(d=>d.contactId===curId).sort((a,b)=>{
+    const da=a.expiry?daysUntil(a.expiry):9999, db=b.expiry?daysUntil(b.expiry):9999;return da-db;});
+  const gal=alive(state.docs).filter(d=>d.contactId===curId&&d.dtype==='Photo');
+  return '<button class="btn btn-accent btn-sm" onclick="openDocForm()">\ud83d\udcce Upload document</button> '
+    +'<button class="btn btn-ghost btn-sm" onclick="$(\'galleryFile\').click()">\ud83d\udcf7 Add photos</button>'
+    +'<div class="hint" style="margin:7px 0 12px">Photos, PDFs and documents up to '+MAX_FILE_MB+' MB. No videos \u2014 those live on your pen drive.</div>'
+    +(docs.filter(d=>d.dtype!=='Photo').map(docRowHtml).join('')||'<div class="hint">No documents yet.</div>')
+    +(gal.length?'<div class="card-h" style="margin-top:14px">Photo gallery \u00b7 '+gal.length+'</div><div class="photo-strip">'+gal.map(p=>'<div class="ph"><img data-docimg="'+p.id+'" onclick="viewDoc(\''+p.id+'\')" alt=""><button onclick="delDoc(\''+p.id+'\')">\u00d7</button></div>').join('')+'</div>':'');
+}
+async function fillDocThumbs(){
+  for(const el of document.querySelectorAll('[data-doc]')){
+    const d=byId(state.docs,el.getAttribute('data-doc'));
+    if(d&&d.mime&&d.mime.startsWith('image/')){const u=await mediaUrl(d.mediaId);if(u)el.innerHTML='<img src="'+u+'" alt="">';}
+  }
+  for(const el of document.querySelectorAll('[data-docimg]')){
+    const d=byId(state.docs,el.getAttribute('data-docimg'));
+    if(d){const u=await mediaUrl(d.mediaId);if(u)el.src=u;}
+  }
+}
+let pendingDocPreset=null;
+function openDocForm(_,preset){pendingDocPreset=preset||null;$('docFile').value='';$('docFile').click();}
+async function handleDocFile(file){
+  const err=attachmentCheck(file);
+  if(err){toast(err,'err');return;}
+  let dataUrl=await fileToDataUrl(file);
+  let mime=file.type||'application/octet-stream';
+  if(mime.startsWith('image/')){dataUrl=await compressImage(dataUrl);mime='image/jpeg';}
+  const mid=uid();
+  await idbPut({id:mid,contactId:curId,kind:'doc',dataUrl,mime,name:file.name,ts:now()});
+  mediaCache[mid]=dataUrl;
+  const d={id:uid(),contactId:curId,mediaId:mid,fname:file.name,mime,size:Math.round(dataUrl.length*0.73),
+    title:file.name.replace(/\.[^.]+$/,''),dtype:pendingDocPreset||(mime.startsWith('image/')?'Other':'Other'),
+    expiry:'',remindDays:30,created:now(),deleted:false};
+  touch(d);state.docs.push(d);save();
+  openDocMeta(d.id,true);
+}
+function openDocMeta(id,isNew){
+  const d=byId(state.docs,id);if(!d)return;
+  openSheet('<h2>'+(isNew?'Document details':'Edit document')+'</h2><p class="sheet-sub">'+esc(d.fname||'')+' \u00b7 '+bytesNice(d.size||0)+'</p>'
+    +'<div class="field"><label>Title</label><input id="dc_title" value="'+esc(d.title||'')+'"></div>'
+    +'<div class="field"><label>Type</label><select id="dc_type" onchange="$(\'dc_custom_wrap\').style.display=this.value===\'__custom\'?\'\':\'none\'">'+DOC_TYPES.map(t=>'<option'+(d.dtype===t?' selected':'')+'>'+t+'</option>').join('')+(d.dtype&&!DOC_TYPES.includes(d.dtype)&&d.dtype!=='Photo'?'<option selected>'+esc(d.dtype)+'</option>':'')+'<option value="__custom">+ Custom type\u2026</option></select>'
+    +'<div id="dc_custom_wrap" style="display:none;margin-top:7px"><input id="dc_custom" placeholder="e.g. Ration card, RC book, Warranty"></div></div>'
+    +'<div class="field"><label>Expiry date <span style="font-weight:400;color:var(--txt-mute)">(optional \u2014 feeds the Upcoming strip)</span></label><input type="date" id="dc_expiry" value="'+esc(d.expiry||'')+'"></div>'
+    +'<div class="field"><label>Remind ahead (days)</label><input type="number" id="dc_remind" value="'+(d.remindDays||30)+'" min="0" max="365"></div>'
+    +'<button class="btn btn-primary btn-block" onclick="saveDocMeta(\''+d.id+'\')">Save</button>');
+}
+function saveDocMeta(id){
+  const d=byId(state.docs,id);if(!d)return;
+  d.title=$('dc_title').value.trim()||d.fname||'Document';
+  let ty=$('dc_type').value;
+  if(ty==='__custom')ty=($('dc_custom').value||'').trim()||'Other';
+  d.dtype=ty;d.expiry=$('dc_expiry').value;d.remindDays=parseInt($('dc_remind').value)||30;
+  touch(d);save();viewContact(curId,curTab==='med'?'med':'docs');renderHome();toast('Saved','ok');
+}
+async function handleGalleryFiles(files){
+  let n=0;
+  for(const f of files){
+    if(attachmentCheck(f)){continue;}
+    if(!(f.type||'').startsWith('image/'))continue;
+    let dataUrl=await compressImage(await fileToDataUrl(f));
+    const mid=uid();
+    await idbPut({id:mid,contactId:curId,kind:'doc',dataUrl,mime:'image/jpeg',name:f.name,ts:now()});
+    mediaCache[mid]=dataUrl;
+    state.docs.push(touch({id:uid(),contactId:curId,mediaId:mid,fname:f.name,mime:'image/jpeg',size:Math.round(dataUrl.length*0.73),title:f.name.replace(/\.[^.]+$/,''),dtype:'Photo',expiry:'',remindDays:0,created:now(),deleted:false}));
+    n++;
+  }
+  save();viewContact(curId,'docs');toast(n+' photo'+(n===1?'':'s')+' added','ok');
+}
+async function viewDoc(id){
+  const d=byId(state.docs,id);if(!d)return;
+  const u=await mediaUrl(d.mediaId);
+  if(!u){toast('File data missing','err');return;}
+  if((d.mime||'').startsWith('image/'))showLightbox(u);
+  else{const a=document.createElement('a');a.href=u;a.download=d.fname||'document';a.click();toast('Downloading '+(d.fname||'file'));}
+}
+function delDoc(id){
+  const d=byId(state.docs,id);if(!d)return;
+  if(!confirm('Delete "'+(d.title||d.fname)+'"?'))return;
+  d.deleted=true;touch(d);
+  if(d.mediaId){idbDel(d.mediaId).catch(()=>{});delete mediaCache[d.mediaId];}
+  save();viewContact(curId,curTab);renderHome();toast('Deleted');
+}
+
+/* ---- Links tab ---- */
+function tabLinks(){
+  const me=contactOf(curId);
+  const ls=alive(state.links).filter(l=>l.aId===curId||l.bId===curId);
+  return (ls.map(l=>{
+    const other=contactOf(l.aId===curId?l.bId:l.aId);
+    if(!other||other.deleted)return '';
+    const line=l.aId===curId
+      ? esc(me.name.split(' ')[0])+' is <b style="color:var(--amber)">'+esc(l.relation)+'</b> of '+esc(other.name)
+      : esc(other.name)+' is <b style="color:var(--amber)">'+esc(l.relation)+'</b> of '+esc(me.name.split(' ')[0]);
+    return '<div class="file-row"><div class="ava sm" data-photo="'+(other.photoId||'')+'" style="'+avaStyle(other)+'">'+esc(initials(other.name))+'</div>'
+      +'<div class="file-info" style="cursor:pointer" onclick="viewContact(\''+other.id+'\')"><div class="file-name" style="font-weight:500">'+line+'</div></div>'
+      +'<div class="file-acts"><button class="mini-del" onclick="delRec(\'links\',\''+l.id+'\')">\u00d7</button></div></div>';
+  }).join('')||'<div class="hint">Link people together \u2014 "Dr. Ramesh is <i>doctor</i> of Amma", "Priya is <i>spouse</i> of Arun". Links show on both dossiers.</div>')
+  +'<button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openLinkForm()">+ Add link</button>';
+}
+function openLinkForm(){
+  const others=alive(state.contacts).filter(c=>c.id!==curId).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!others.length){toast('Add another contact first','err');return;}
+  openSheet('<h2>Link contacts</h2><p class="sheet-sub">Reads as: <b>[This person] is [relation] of [other person]</b> \u2014 shown on both profiles.</p>'
+    +'<div class="field"><label>This person</label><select id="lk_dir"><option value="a">'+esc(contactOf(curId).name)+'</option><option value="b">The other person</option></select></div>'
+    +'<div class="field"><label>Relation</label><input id="lk_rel" list="relList" placeholder="doctor / spouse / son / agent / landlord\u2026"><datalist id="relList">'+['doctor','spouse','son','daughter','father','mother','brother','sister','friend','agent','colleague','landlord','neighbour'].map(r=>'<option value="'+r+'">').join('')+'</datalist></div>'
+    +'<div class="field"><label>Other person</label><select id="lk_other">'+others.map(o=>'<option value="'+o.id+'">'+esc(o.name)+'</option>').join('')+'</select></div>'
+    +'<button class="btn btn-primary btn-block" onclick="saveLink()">Save link</button>');
+}
+function saveLink(){
+  const rel=$('lk_rel').value.trim();if(!rel){toast('Relation required','err');return;}
+  const other=$('lk_other').value, dir=$('lk_dir').value;
+  state.links.push(touch({id:uid(),aId:dir==='a'?curId:other,bId:dir==='a'?other:curId,relation:rel,created:now(),deleted:false}));
+  save();viewContact(curId,'links');toast('Linked','ok');
+}
+
+/* ===== Groups view ===== */
+const GROUP_COLORS=['#f5b74a','#5ea8f5','#3ecf8e','#ef8354','#b58af0','#f56fa1','#6fd6e8','#c8d16f'];
+function renderGroups(){
+  const gs=alive(state.groups);
+  $('groupsArea').innerHTML='<button class="btn btn-primary btn-sm" style="margin-bottom:12px" onclick="openGroupForm()">+ New group</button>'
+    +(gs.map(g=>{
+      const members=alive(state.contacts).filter(c=>(c.groupIds||[]).includes(g.id));
+      return '<div class="rep-card" onclick="viewGroup(\''+g.id+'\')"><div class="rep-ic" style="background:'+g.color+'22"><span style="width:16px;height:16px;border-radius:50%;background:'+g.color+'"></span></div>'
+        +'<div style="flex:1"><div class="rep-t">'+esc(g.name)+'</div><div class="rep-s">'+members.length+' member'+(members.length===1?'':'s')+(g.notes?' \u00b7 has notes':'')+'</div></div><span style="color:var(--txt-mute)">\u203a</span></div>';
+    }).join('')||'<div class="card" style="text-align:center;color:var(--txt-mute)">No groups yet. Family, Doctors, Agents, Shipmates\u2026</div>');
+}
+function openGroupForm(id){
+  const g=id?byId(state.groups,id):null;
+  openSheet('<h2>'+(g?'Edit group':'New group')+'</h2>'
+    +'<div class="field"><label>Name *</label><input id="gf_name" value="'+esc(g&&g.name||'')+'" placeholder="e.g. Family"></div>'
+    +'<div class="field"><label>Colour</label><div class="chips">'+GROUP_COLORS.map(c=>'<button class="chip'+((g&&g.color)===c?' on':'')+'" data-col="'+c+'" onclick="[...this.parentNode.children].forEach(x=>x.classList.remove(\'on\'));this.classList.add(\'on\')"><span class="gdot" style="background:'+c+'"></span></button>').join('')+'</div></div>'
+    +'<button class="btn btn-primary btn-block" onclick="saveGroup(\''+(g?g.id:'')+'\')">Save</button>'
+    +(g?'<button class="btn btn-danger btn-block" style="margin-top:10px" onclick="deleteGroup(\''+g.id+'\')">Delete group</button>':''));
+}
+function saveGroup(id){
+  const name=$('gf_name').value.trim();if(!name){toast('Name required','err');return;}
+  const colBtn=document.querySelector('#sheetBody .chip.on[data-col]');
+  let g=id?byId(state.groups,id):null;
+  if(!g){g={id:uid(),notes:'',created:now(),deleted:false};state.groups.push(g);}
+  g.name=name;g.color=colBtn?colBtn.getAttribute('data-col'):GROUP_COLORS[alive(state.groups).length%GROUP_COLORS.length];
+  touch(g);save();renderGroups();renderHome();
+  viewGroup(g.id);
+  toast(id?'Saved':'Group created \u2014 now add members','ok');
+}
+function deleteGroup(id){
+  const g=byId(state.groups,id);if(!g)return;
+  if(!confirm('Delete group "'+g.name+'"? Contacts stay \u2014 only the label goes.'))return;
+  g.deleted=true;touch(g);save();closeSheet();renderGroups();renderHome();toast('Deleted');
+}
+function viewGroup(id){
+  const g=byId(state.groups,id);if(!g)return;
+  const members=alive(state.contacts).filter(c=>(c.groupIds||[]).includes(id)).sort((a,b)=>a.name.localeCompare(b.name));
+  openSheet('<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span class="gdot" style="width:16px;height:16px;background:'+g.color+'"></span><h2 style="margin:0">'+esc(g.name)+'</h2>'
+    +'<button class="icon-btn" style="margin-left:auto" onclick="openGroupForm(\''+id+'\')"><svg viewBox="0 0 24 24"><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button></div>'
+    +'<p class="sheet-sub">'+members.length+' member'+(members.length===1?'':'s')+'</p>'
+    +'<button class="btn btn-accent btn-sm" style="margin-bottom:12px" onclick="openGroupMembers(\''+id+'\')">+ Add / remove members</button>'
+    +'<div class="field"><label>Group notes</label><textarea id="gn_notes" style="min-height:64px" placeholder="e.g. Land tax due every March">'+esc(g.notes||'')+'</textarea>'
+    +'<button class="btn btn-ghost btn-sm" style="margin-top:7px" onclick="saveGroupNotes(\''+id+'\')">Save notes</button></div>'
+    +members.map(contactRowHtml).join(''));
+  fillAvatars($('sheetBody'));
+}
+function openGroupMembers(gid){
+  const g=byId(state.groups,gid);if(!g)return;
+  const cs=alive(state.contacts).sort((a,b)=>a.name.localeCompare(b.name));
+  openSheet('<h2><span class="gdot" style="width:14px;height:14px;background:'+g.color+'"></span> '+esc(g.name)+' \u2014 members</h2>'
+    +'<p class="sheet-sub">Tick to add, untick to remove. A person can belong to many groups.</p>'
+    +(cs.length?cs.map(c=>'<div class="prom-row" style="align-items:center"><input type="checkbox" '+((c.groupIds||[]).includes(gid)?'checked':'')+' onchange="toggleGroupMember(\''+c.id+'\',\''+gid+'\')"><div class="ava sm" data-photo="'+(c.photoId||'')+'" style="'+avaStyle(c)+'">'+esc(initials(c.name))+'</div><div class="prom-tx">'+esc(c.name)+'</div></div>').join(''):'<div class="hint">No contacts yet \u2014 add people first.</div>')
+    +'<button class="btn btn-primary btn-block" style="margin-top:14px" onclick="viewGroup(\''+gid+'\')">Done</button>');
+  fillAvatars($('sheetBody'));
+}
+function toggleGroupMember(cid,gid){
+  const c=contactOf(cid);if(!c)return;
+  c.groupIds=c.groupIds||[];
+  const i=c.groupIds.indexOf(gid);
+  if(i>=0)c.groupIds.splice(i,1);else c.groupIds.push(gid);
+  touch(c);save();renderHome();
+}
+function saveGroupNotes(id){
+  const g=byId(state.groups,id);if(!g)return;
+  g.notes=$('gn_notes').value.trim();touch(g);save();toast('Notes saved','ok');
+}
+
+/* ===== vCard (.vcf) import — repeatable, merges by phone ===== */
+function parseVcf(text){
+  const cards=[];
+  const blocks=text.split(/BEGIN:VCARD/i).slice(1);
+  for(let raw of blocks){
+    raw=raw.split(/END:VCARD/i)[0];
+    // unfold continuation lines (CRLF + space/tab)
+    const lines=raw.replace(/\r\n[ \t]/g,'').replace(/\n[ \t]/g,'').split(/\r?\n/).filter(Boolean);
+    const c={name:'',phones:[],emails:[],dob:'',photo:null};
+    for(const line of lines){
+      const ci=line.indexOf(':');if(ci<1)continue;
+      const head=line.slice(0,ci).toUpperCase(), val=line.slice(ci+1).trim();
+      const prop=head.split(';')[0];
+      if(prop==='FN'&&!c.name)c.name=val.replace(/\\,/g,',');
+      else if(prop==='N'&&!c.name){const p=val.split(';');c.name=[p[1],p[0]].filter(Boolean).join(' ').trim();}
+      else if(prop==='TEL'&&val){
+        let label='Mobile';
+        if(/HOME/i.test(head))label='Home';else if(/WORK/i.test(head))label='Work';else if(/CELL|MOBILE/i.test(head))label='Mobile';else label='Other';
+        c.phones.push({label,number:val});
+      }
+      else if(prop==='EMAIL'&&val)c.emails.push(val);
+      else if(prop==='BDAY'){
+        let m=val.match(/^(\d{4})-?(\d{2})-?(\d{2})/);
+        if(m)c.dob=m[1]+'-'+m[2]+'-'+m[3];
+        else{m=val.match(/^--(\d{2})-?(\d{2})/);if(m)c.dob='1900-'+m[1]+'-'+m[2];}
+      }
+      else if(prop==='PHOTO'){
+        if(/^data:image/i.test(val))c.photo=val;
+        else if(/ENCODING=B|BASE64/i.test(head)){
+          let type='jpeg';const tm=head.match(/TYPE=([A-Z]+)/i);if(tm)type=tm[1].toLowerCase();
+          c.photo='data:image/'+type+';base64,'+val.replace(/\s/g,'');
+        }
+      }
+    }
+    if(c.name)cards.push(c);
+  }
+  return cards;
+}
+async function importVcf(text){
+  const cards=parseVcf(text);
+  if(!cards.length){toast('No contacts found in that file','err');return;}
+  // index existing by normalized phone and by lowercase name
+  const byPhone={},byName={};
+  alive(state.contacts).forEach(c=>{
+    (c.phones||[]).forEach(p=>{const k=normPhone(p.number);if(k)byPhone[k]=c;});
+    byName[c.name.toLowerCase()]=c;
+  });
+  let added=0,updated=0;
+  for(const vc of cards){
+    let ex=null;
+    for(const p of vc.phones){const k=normPhone(p.number);if(k&&byPhone[k]){ex=byPhone[k];break;}}
+    if(!ex)ex=byName[vc.name.toLowerCase()]||null;
+    if(ex){
+      let changed=false;
+      // merge phones (new numbers only)
+      const have=new Set((ex.phones||[]).map(p=>normPhone(p.number)));
+      vc.phones.forEach(p=>{const k=normPhone(p.number);if(k&&!have.has(k)){ex.phones=ex.phones||[];ex.phones.push(p);have.add(k);changed=true;}});
+      const haveE=new Set((ex.emails||[]).map(e=>e.toLowerCase()));
+      vc.emails.forEach(e=>{if(!haveE.has(e.toLowerCase())){ex.emails=ex.emails||[];ex.emails.push(e);haveE.add(e.toLowerCase());changed=true;}});
+      if(vc.dob&&!ex.dob){ex.dob=vc.dob;changed=true;}
+      if(vc.photo&&!ex.photoId){
+        const durl=await compressImage(vc.photo);
+        const mid=uid();await idbPut({id:mid,contactId:ex.id,kind:'profile',dataUrl:durl,mime:'image/jpeg',name:'vcf.jpg',ts:now()});
+        mediaCache[mid]=durl;ex.photoId=mid;changed=true;
+      }
+      if(changed){touch(ex);updated++;}
+    }else{
+      const c={id:uid(),name:vc.name,phones:vc.phones,emails:vc.emails,dob:vc.dob,bloodGroup:'',allergies:'',address:'',custom:[],groupIds:[],pinned:false,photoId:null,created:now(),deleted:false};
+      if(vc.photo){
+        const durl=await compressImage(vc.photo);
+        const mid=uid();await idbPut({id:mid,contactId:c.id,kind:'profile',dataUrl:durl,mime:'image/jpeg',name:'vcf.jpg',ts:now()});
+        mediaCache[mid]=durl;c.photoId=mid;
+      }
+      touch(c);state.contacts.push(c);
+      (c.phones||[]).forEach(p=>{const k=normPhone(p.number);if(k)byPhone[k]=c;});
+      byName[c.name.toLowerCase()]=c;
+      added++;
+    }
+  }
+  save();renderAll();
+  toast('Imported: '+added+' new \u00b7 '+updated+' updated','ok');
+}
+</script>
+<script>
+/* ===== Print preview (ShipSuite rule: preview first; window.print() ONLY on button) ===== */
+function openPrint(html){$('printBody').innerHTML=html;$('printWrap').classList.add('open');$('printScroll').scrollTop=0;ensureGuard();}
+function closePrint(){$('printWrap').classList.remove('open');}
+function printOpen(){return $('printWrap').classList.contains('open');}
+function doPrint(){window.print();}
+function ppFoot(){return '<div class="pp-foot"><span>PRM \u00b7 Ship Suite</span><span>Generated '+new Date().toLocaleString()+'</span></div>';}
+function ptBadge(days){const t=tierFor(days);return '<span class="pt pt-'+(t||'ok')+'">'+(t==='expired'?'EXPIRED':tierLabel(days))+'</span>';}
+
+/* ===== Reports home ===== */
+function renderReports(){
+  const cs=alive(state.contacts).sort((a,b)=>a.name.localeCompare(b.name));
+  const gs=alive(state.groups);
+  const csel=id=>'<select id="'+id+'" onclick="event.stopPropagation()">'+cs.map(c=>'<option value="'+c.id+'">'+esc(c.name)+'</option>').join('')+'</select>';
+  $('reportsArea').innerHTML=!cs.length?'<div class="card" style="text-align:center;color:var(--txt-mute)">Add contacts first \u2014 reports live here.</div>':
+    '<div class="card"><div class="card-h"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Emergency card</div>'
+    +'<p class="hint" style="margin-bottom:9px">One printable page: blood group, allergies, medications, doctors, key documents. Leave copies at home before signing on.</p>'
+    +'<div style="display:flex;gap:8px">'+csel('rep_em')+'<button class="btn btn-primary btn-sm" style="flex:0 0 auto" onclick="repEmergency($(\'rep_em\').value)">Preview</button></div></div>'
+
+    +'<div class="card"><div class="card-h"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Contact dossier</div>'
+    +'<p class="hint" style="margin-bottom:9px">Everything on one person \u2014 details, dates, notes, promises, medical, documents, links.</p>'
+    +'<div style="display:flex;gap:8px">'+csel('rep_dz')+'<button class="btn btn-primary btn-sm" style="flex:0 0 auto" onclick="repDossier($(\'rep_dz\').value)">Preview</button></div></div>'
+
+    +'<div class="rep-card" onclick="repBirthdays()"><div class="rep-ic" style="background:#3ecf8e22"><svg viewBox="0 0 24 24" stroke="#3ecf8e"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s1.5-2 4-2 4 2 4 2 1.5-2 4-2 4 2 4 2"/><path d="M12 3v4M8 5v2M16 5v2"/></svg></div>'
+    +'<div style="flex:1"><div class="rep-t">Birthday report</div><div class="rep-s">Year at a glance, month by month \u2014 birthdays and anniversaries</div></div></div>'
+
+    +'<div class="rep-card" onclick="repExpiry()"><div class="rep-ic" style="background:#ef5b5b22"><svg viewBox="0 0 24 24" stroke="#ef5b5b"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>'
+    +'<div style="flex:1"><div class="rep-t">Expiry register</div><div class="rep-s">All document expiries and deadlines, urgency-tiered</div></div></div>'
+
+    +(gs.length?'<div class="card"><div class="card-h"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Group roster</div>'
+    +'<div style="display:flex;gap:8px"><select id="rep_gr">'+gs.map(g=>'<option value="'+g.id+'">'+esc(g.name)+'</option>').join('')+'</select><button class="btn btn-primary btn-sm" style="flex:0 0 auto" onclick="repRoster($(\'rep_gr\').value)">Preview</button></div></div>':'');
+}
+
+async function heroHtml(c,sub){
+  const u=await mediaUrl(c.photoId);
+  return '<div class="pp-hero">'+(u?'<div class="wmark"><img src="'+u+'"></div>':'')
+    +'<div class="hava">'+(u?'<img src="'+u+'">':esc(initials(c.name)))+'</div>'
+    +'<div><div class="hn">'+esc(c.name)+'</div><div class="hs">'+sub+'</div></div></div>';
+}
+
+/* ---- Emergency card ---- */
+async function repEmergency(cid){
+  const c=contactOf(cid);if(!c)return;
+  const meds=alive(state.meds).filter(m=>m.contactId===cid&&m.active!==false);
+  const docs=alive(state.docs).filter(d=>d.contactId===cid&&d.dtype!=='Photo');
+  const docLinks=alive(state.links).filter(l=>(l.bId===cid&&/doctor|dr\b/i.test(l.relation))||(l.aId===cid&&/patient/i.test(l.relation)));
+  const doctors=docLinks.map(l=>contactOf(l.aId===cid?l.bId:l.aId)).filter(Boolean);
+  const emerg=alive(state.contacts).filter(x=>x.id!==cid&&alive(state.links).some(l=>(l.aId===cid&&l.bId===x.id)||(l.bId===cid&&l.aId===x.id))).slice(0,4);
+  const kv=(k,v)=>v?'<div class="kv"><b>'+k+'</b><span>'+v+'</span></div>':'';
+  openPrint('<div class="pp">'
+    +'<div class="em-band">EMERGENCY INFORMATION CARD</div>'
+    +await heroHtml(c,[c.dob?fmtDate(c.dob)+' \u00b7 '+ageFrom(c.dob)+' yrs':'',c.bloodGroup?'Blood: '+esc(c.bloodGroup):''].filter(Boolean).join(' \u00b7 '))
+    +kv('Blood group',c.bloodGroup?'<b style="font-size:1.05rem;color:#b91c1c">'+esc(c.bloodGroup)+'</b>':'')
+    +kv('Allergies',c.allergies?'<b style="color:#b91c1c">'+esc(c.allergies)+'</b>':'')
+    +kv('Address',esc(c.address).replace(/\n/g,'<br>'))
+    +(c.phones||[]).map(p=>kv(p.label+' phone',esc(p.number))).join('')
+    +alive(state.places).filter(p=>p.contactId===cid&&p.tag==='Home').map(p=>kv('Location \u2014 '+esc(p.label),esc(p.query))).join('')
+    +(c.custom||[]).map(f=>kv(esc(f.k),esc(f.v))).join('')
+    +(meds.length?'<h3>Current medications</h3><table><tr><th>Medicine</th><th>Dose / schedule</th><th>Notes</th></tr>'+meds.map(m=>'<tr><td><b>'+esc(m.name)+'</b></td><td>'+esc(m.dose||'\u2014')+'</td><td>'+esc(m.notes||'')+'</td></tr>').join('')+'</table>':'')
+    +(doctors.length?'<h3>Doctors</h3>'+doctors.map(d=>kv(esc(d.name),(d.phones||[]).map(p=>esc(p.number)).join(' \u00b7 ')||'\u2014')).join(''):'')
+    +(emerg.length?'<h3>Emergency contacts</h3>'+emerg.map(e=>kv(esc(e.name),(e.phones||[]).map(p=>esc(p.number)).join(' \u00b7 ')||'\u2014')).join(''):'')
+    +(docs.length?'<h3>Key documents</h3><table><tr><th>Document</th><th>Type</th><th>Expiry</th></tr>'+docs.map(d=>'<tr><td>'+esc(d.title)+'</td><td>'+esc(d.dtype)+'</td><td>'+(d.expiry?fmtDate(d.expiry)+' '+ptBadge(daysUntil(d.expiry)):'\u2014')+'</td></tr>').join('')+'</table>':'')
+    +ppFoot()+'</div>');
+}
+
+/* ---- Dossier ---- */
+async function repDossier(cid){
+  const c=contactOf(cid);if(!c)return;
+  const gs=(c.groupIds||[]).map(g=>byId(state.groups,g)).filter(g=>g&&!g.deleted).map(g=>g.name).join(', ');
+  const dates=alive(state.dates).filter(d=>d.contactId===cid);
+  const notes=alive(state.notes).filter(n=>n.contactId===cid).sort((a,b)=>b.ts-a.ts);
+  const proms=alive(state.promises).filter(p=>p.contactId===cid);
+  const meds=alive(state.meds).filter(m=>m.contactId===cid);
+  const appts=alive(state.appts).filter(a=>a.contactId===cid).sort((a,b)=>b.date.localeCompare(a.date));
+  const docs=alive(state.docs).filter(d=>d.contactId===cid&&d.dtype!=='Photo');
+  const links=alive(state.links).filter(l=>l.aId===cid||l.bId===cid);
+  const places=alive(state.places).filter(p=>p.contactId===cid);
+  const kv=(k,v)=>v?'<div class="kv"><b>'+k+'</b><span>'+v+'</span></div>':'';
+  openPrint('<div class="pp">'
+    +await heroHtml(c,[gs,c.dob?fmtDate(c.dob)+' \u00b7 '+ageFrom(c.dob)+' yrs':''].filter(Boolean).join(' \u00b7 '))
+    +'<div class="pp-sub">Complete dossier</div>'
+    +(c.phones||[]).map(p=>kv(p.label,esc(p.number))).join('')
+    +(c.emails||[]).map(e=>kv('Email',esc(e))).join('')
+    +kv('Blood group',esc(c.bloodGroup))+kv('Allergies',esc(c.allergies))+kv('Address',esc(c.address).replace(/\n/g,'<br>'))
+    +(c.custom||[]).map(f=>kv(esc(f.k),esc(f.v))).join('')
+    +(places.length?'<h3>Places</h3><table><tr><th>Name</th><th>Tag</th><th>Location</th><th>Note</th></tr>'+places.map(p=>'<tr><td><b>'+esc(p.label)+'</b></td><td>'+esc(p.tag||'')+'</td><td>'+esc(p.query)+'</td><td>'+esc(p.note||'')+'</td></tr>').join('')+'</table>':'')
+    +(dates.length?'<h3>Important dates</h3><table><tr><th>What</th><th>When</th><th>Status</th></tr>'+dates.map(d=>'<tr><td>'+esc(d.label)+'</td><td>'+(d.recurring?fmtDM(d.date)+' yearly':fmtDate(d.date))+'</td><td>'+(d.recurring?tierLabel((nextOccurrence(d.date)||{}).days):ptBadge(daysUntil(d.date)))+'</td></tr>').join('')+'</table>':'')
+    +(meds.length||appts.length?'<h3>Medical</h3>'
+      +(meds.length?'<table><tr><th>Medication</th><th>Dose</th><th>Status</th></tr>'+meds.map(m=>'<tr><td>'+esc(m.name)+'</td><td>'+esc(m.dose||'\u2014')+'</td><td>'+(m.active===false?'Stopped':'Active')+'</td></tr>').join('')+'</table>':'')
+      +(appts.length?'<table><tr><th>Date</th><th>Doctor</th><th>Purpose</th><th>Notes</th></tr>'+appts.map(a=>'<tr><td>'+fmtDate(a.date)+'</td><td>'+esc(a.doctor||'\u2014')+'</td><td>'+esc(a.purpose||'')+'</td><td>'+esc(a.notes||'')+'</td></tr>').join('')+'</table>':''):'')
+    +(docs.length?'<h3>Documents</h3><table><tr><th>Title</th><th>Type</th><th>Expiry</th></tr>'+docs.map(d=>'<tr><td>'+esc(d.title)+'</td><td>'+esc(d.dtype)+'</td><td>'+(d.expiry?fmtDate(d.expiry)+' '+ptBadge(daysUntil(d.expiry)):'\u2014')+'</td></tr>').join('')+'</table>':'')
+    +(proms.length?'<h3>Promises &amp; gifts</h3><table><tr><th>Item</th><th>Logged</th><th>Status</th></tr>'+proms.map(p=>'<tr><td>'+esc(p.text)+'</td><td>'+new Date(p.ts).toLocaleDateString()+'</td><td>'+(p.done?'<span class="pt pt-ok">DONE</span>':'<span class="pt pt-amber">OPEN</span>')+'</td></tr>').join('')+'</table>':'')
+    +(links.length?'<h3>Relationships</h3>'+links.map(l=>{const o=contactOf(l.aId===cid?l.bId:l.aId);if(!o)return '';return kv(l.aId===cid?esc(c.name.split(' ')[0])+' is '+esc(l.relation)+' of':esc(o.name)+' is '+esc(l.relation)+' of',l.aId===cid?esc(o.name):esc(c.name.split(' ')[0]));}).join(''):'')
+    +(notes.length?'<h3>Points to remember</h3>'+notes.map(n=>'<div class="kv"><b>'+new Date(n.ts).toLocaleDateString()+'</b><span>'+esc(n.text)+'</span></div>').join(''):'')
+    +ppFoot()+'</div>');
+}
+
+/* ---- Birthday report ---- */
+function repBirthdays(){
+  const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const rows=[];
+  alive(state.contacts).forEach(c=>{if(c.dob){const d=parseDate(c.dob);const by=d.getFullYear();const turns=new Date().getFullYear()-by;rows.push({m:d.getMonth(),day:d.getDate(),label:c.name,sub:by>1900?('Turns '+turns+' \u00b7 born '+by):'Birthday'});}});
+  alive(state.dates).filter(d=>d.recurring).forEach(dt=>{const c=contactOf(dt.contactId);if(!c||c.deleted)return;const d=parseDate(dt.date);const y0=d.getFullYear();const yrs=new Date().getFullYear()-y0;rows.push({m:d.getMonth(),day:d.getDate(),label:c.name,sub:dt.label+(y0>1900&&yrs>0?' \u00b7 '+yrs+' years':'')});});
+  if(!rows.length){toast('No birthdays or recurring dates yet','err');return;}
+  let html='<div class="pp"><h1>Birthdays &amp; anniversaries</h1><div class="pp-sub">Year at a glance \u00b7 '+rows.length+' dates</div>';
+  for(let m=0;m<12;m++){
+    const mr=rows.filter(r=>r.m===m).sort((a,b)=>a.day-b.day);
+    if(!mr.length)continue;
+    html+='<h3>'+MN[m]+'</h3><table>'+mr.map(r=>'<tr><td style="width:52px"><b>'+r.day+'</b></td><td>'+esc(r.label)+'</td><td style="color:#5a6b85">'+esc(r.sub)+'</td></tr>').join('')+'</table>';
+  }
+  openPrint(html+ppFoot()+'</div>');
+}
+
+/* ---- Expiry register ---- */
+function repExpiry(){
+  const rows=[];
+  alive(state.docs).forEach(d=>{if(!d.expiry)return;const c=contactOf(d.contactId);if(!c||c.deleted)return;
+    rows.push({days:daysUntil(d.expiry),who:c.name,what:d.title,type:d.dtype,when:d.expiry});});
+  alive(state.dates).filter(d=>!d.recurring).forEach(dt=>{const c=contactOf(dt.contactId);if(!c||c.deleted)return;
+    rows.push({days:daysUntil(dt.date),who:c.name,what:dt.label,type:'Deadline',when:dt.date});});
+  if(!rows.length){toast('No expiries or deadlines recorded','err');return;}
+  rows.sort((a,b)=>a.days-b.days);
+  openPrint('<div class="pp"><h1>Expiry register</h1><div class="pp-sub">'+rows.length+' tracked items \u00b7 urgency-tiered</div>'
+    +'<table><tr><th>Status</th><th>Person</th><th>Item</th><th>Type</th><th>Date</th></tr>'
+    +rows.map(r=>'<tr><td>'+ptBadge(r.days)+'</td><td>'+esc(r.who)+'</td><td><b>'+esc(r.what)+'</b></td><td>'+esc(r.type)+'</td><td>'+fmtDate(r.when)+'</td></tr>').join('')
+    +'</table>'+ppFoot()+'</div>');
+}
+
+/* ---- Group roster ---- */
+function repRoster(gid){
+  const g=byId(state.groups,gid);if(!g)return;
+  const members=alive(state.contacts).filter(c=>(c.groupIds||[]).includes(gid)).sort((a,b)=>a.name.localeCompare(b.name));
+  openPrint('<div class="pp"><h1>'+esc(g.name)+' \u2014 roster</h1><div class="pp-sub">'+members.length+' members</div>'
+    +(g.notes?'<div class="kv"><b>Group notes</b><span>'+esc(g.notes)+'</span></div>':'')
+    +'<table><tr><th>Name</th><th>Phones</th><th>Email</th><th>Birthday</th></tr>'
+    +members.map(c=>'<tr><td><b>'+esc(c.name)+'</b></td><td>'+((c.phones||[]).map(p=>esc(p.number)).join('<br>')||'\u2014')+'</td><td>'+((c.emails||[])[0]?esc(c.emails[0]):'\u2014')+'</td><td>'+(c.dob?fmtDM(c.dob):'\u2014')+'</td></tr>').join('')
+    +'</table>'+ppFoot()+'</div>');
+}
+</script>
+<script>
+/* ===== Settings ===== */
+function renderSettings(){
+  const trash=state.contacts.filter(c=>c.deleted);
+  $('settingsArea').innerHTML=
+    '<div class="card"><div class="card-h"><svg viewBox="0 0 24 24"><path d="M16 16v-3a4 4 0 0 0-8 0v3"/><path d="M12 2v3M4 22h16"/><rect x="2" y="16" width="20" height="6" rx="2"/></svg>Phone contacts (.vcf)</div>'
+    +'<p class="hint" style="margin-bottom:9px">Export contacts from your phone as a .vcf file and import here. Re-importing later is safe \u2014 people are matched by phone number and only updated, never duplicated.</p>'
+    +'<button class="btn btn-accent btn-block" onclick="$(\'vcfFile\').value=\'\';$(\'vcfFile\').click()">Import .vcf file</button></div>'
+
+    +'<div class="card"><div class="card-h"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>Backup &amp; sync</div>'
+    +'<p class="hint" style="margin-bottom:9px">One master JSON \u2014 import on any device (desktop or phone) and it merges safely: newest edit wins, nothing is wiped, importing twice is harmless.</p>'
+    +'<button class="btn btn-ghost btn-block" style="margin-bottom:8px" onclick="exportJson(false)">Export \u2014 state only (light)</button>'
+    +'<button class="btn btn-ghost btn-block" style="margin-bottom:8px" onclick="exportJson(true)">Export \u2014 with photos &amp; files</button>'
+    +'<button class="btn btn-accent btn-block" onclick="$(\'importJsonFile\').value=\'\';$(\'importJsonFile\').click()">Import &amp; merge backup</button></div>'
+
+    +'<div class="card"><div class="card-h"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>Appearance</div>'
+    +'<label style="display:flex;align-items:center;gap:11px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--txt);margin:0"><input type="checkbox" style="width:19px;height:19px;accent-color:var(--amber)" '+(state.settings.theme==='amoled'?'checked':'')+' onchange="setTheme(this.checked)">Pure black (AMOLED)</label>'
+    +'<p class="hint" style="margin-top:6px">True-black background \u2014 easier on the eyes at night and saves battery on OLED phone screens.</p></div>'
+
+    +'<div class="card"><div class="card-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 5V3M12 21v-2M5 12H3M21 12h-2"/></svg>Photo compression</div>'
+    +'<p class="hint">Larger = sharper photos, heavier backups. Applies to newly added photos.</p>'
+    +'<div style="display:flex;align-items:center;gap:12px;margin-top:8px"><input type="range" min="80" max="600" step="20" id="st_maxkb" value="'+(state.settings.photoMaxKB||200)+'" oninput="$(\'st_kbv\').textContent=this.value+\' KB\'" onchange="state.settings.photoMaxKB=parseInt(this.value);save();toast(\'Saved\',\'ok\')" style="padding:0"><b id="st_kbv" style="flex:0 0 64px;text-align:right">'+(state.settings.photoMaxKB||200)+' KB</b></div></div>'
+
+    +(trash.length?'<div class="card"><div class="card-h"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m1 0v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6"/></svg>Trash \u00b7 '+trash.length+'</div>'
+      +trash.map(c=>'<div class="file-row"><div class="ava sm" style="'+avaStyle(c)+'">'+esc(initials(c.name))+'</div><div class="file-info"><div class="file-name">'+esc(c.name)+'</div></div>'
+      +'<button class="btn btn-ghost btn-sm" onclick="restoreContact(\''+c.id+'\')">Restore</button></div>').join('')+'</div>':'')
+
+    +'<div class="card"><div class="card-h">Data</div>'
+    +'<button class="btn btn-danger btn-block" onclick="wipeAll()">Erase everything</button></div>'
+    +'<div class="hint" style="text-align:center;padding:4px 0 14px">PRM \u00b7 Ship Suite \u00b7 offline-first \u00b7 '+(IS_DESK?'desktop':'browser')+' mode</div>';
+}
+function restoreContact(id){const c=contactOf(id);if(!c)return;c.deleted=false;touch(c);save();renderSettings();renderHome();toast('Restored '+c.name,'ok');}
+async function wipeAll(){
+  if(!confirm('Erase ALL contacts, records and files on this device? Exported backups are not touched.'))return;
+  if(!confirm('Really sure? This cannot be undone.'))return;
+  state=blankState();save();
+  await idbClearAll().catch(()=>{});
+  for(const k in mediaCache)delete mediaCache[k];
+  renderAll();toast('All data erased');
+}
+
+/* ===== File input wiring ===== */
+$('vcfFile').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>importVcf(r.result);r.readAsText(f);
+});
+$('importJsonFile').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=async()=>{
+    try{
+      const rep=await importPayload(JSON.parse(r.result));
+      if(rep)toast('Merged: '+rep.added+' new \u00b7 '+rep.updated+' updated'+(rep.media?' \u00b7 '+rep.media+' files':''),'ok');
+      else toast('Not a PRM backup file','err');
+    }catch(err){toast('Could not read that file','err');}
+  };
+  r.readAsText(f);
+});
+$('docFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)handleDocFile(f);});
+$('attFile').addEventListener('change',e=>{const fs=[...e.target.files];if(fs.length)handleAttFiles(fs);e.target.value='';});
+$('galleryFile').addEventListener('change',e=>{const fs=[...e.target.files];if(fs.length)handleGalleryFiles(fs);e.target.value='';});
+$('profPhotoFile').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  if((f.type||'').startsWith('video/')){toast('Not a photo','err');return;}
+  const durl=await compressImage(await fileToDataUrl(f));
+  formPhotoDataUrl=durl;formPhotoRemoved=false;
+  const av=$('cf_ava');if(av)av.innerHTML='<img src="'+durl+'" alt="">';
+  e.target.value='';
+});
+
+/* ===== Mobile back-button guard (close overlays instead of leaving) ===== */
+let guardArmed=false;
+function ensureGuard(){
+  if(guardArmed)return;
+  try{history.pushState({prm:1},'');guardArmed=true;}catch(e){}
+}
+window.addEventListener('popstate',()=>{
+  guardArmed=false;
+  if(printOpen()){closePrint();ensureGuard();}
+  else if(sheetOpen()){closeSheet();ensureGuard();}
+  else if(currentView!=='home'){nav('home',true);ensureGuard();}
+});
+
+/* ===== Demo data ===== */
+function drawDemoPhoto(name,hue){
+  const cv=document.createElement('canvas');cv.width=cv.height=240;
+  const cx=cv.getContext('2d');
+  const g=cx.createLinearGradient(0,0,240,240);
+  g.addColorStop(0,'hsl('+hue+',60%,62%)');g.addColorStop(1,'hsl('+((hue+50)%360)+',60%,38%)');
+  cx.fillStyle=g;cx.fillRect(0,0,240,240);
+  cx.fillStyle='rgba(255,255,255,.92)';cx.font='900 96px system-ui';cx.textAlign='center';cx.textBaseline='middle';
+  cx.fillText(initials(name),120,128);
+  return cv.toDataURL('image/jpeg',0.8);
+}
+function iso(d){return d.toISOString().slice(0,10);}
+function shiftDays(n){const d=new Date();d.setDate(d.getDate()+n);return iso(d);}
+async function seedDemo(){
+  const t=now();
+  const G=[['Family','#f5b74a'],['Doctors','#5ea8f5'],['Agents','#3ecf8e'],['Friends','#b58af0'],['Shipmates','#6fd6e8']]
+    .map(([name,color])=>({id:uid(),name,color,notes:'',created:t,modified:t,deleted:false}));
+  G[0].notes='Land tax due every March. House insurance with United India.';
+  state.groups.push(...G);
+  const mk=(name,o)=>Object.assign({id:uid(),name,phones:[],emails:[],dob:'',bloodGroup:'',allergies:'',address:'',custom:[],groupIds:[],pinned:false,photoId:null,created:t,modified:t,deleted:false},o);
+  const yr=new Date().getFullYear();
+  const amma=mk('Lakshmi Narayanan',{phones:[{label:'Mobile',number:'+91 94433 21001'}],dob:(yr-63)+'-0'+(1+((new Date().getMonth())%9))+'-15',bloodGroup:'B+',allergies:'Penicillin',address:'12, Beach Road, Puducherry 605001',groupIds:[G[0].id],pinned:true,custom:[{k:'Aadhaar',v:'XXXX 4521'}]});
+  const appa=mk('Narayanan Iyer',{phones:[{label:'Mobile',number:'+91 94433 21002'}],dob:(yr-67)+'-11-02',bloodGroup:'O+',address:'12, Beach Road, Puducherry 605001',groupIds:[G[0].id],pinned:true});
+  const bro=mk('Karthik Narayanan',{phones:[{label:'Mobile',number:'+91 98844 55210'}],emails:['karthik.n@gmail.com'],dob:(yr-31)+'-05-21',groupIds:[G[0].id]});
+  const drR=mk('Dr. Ramesh Kumar',{phones:[{label:'Work',number:'+91 413 222 7890'},{label:'Mobile',number:'+91 90032 11456'}],groupIds:[G[1].id],custom:[{k:'Clinic',v:'JIPMER Cardiology, Wed & Sat'}]});
+  const drS=mk('Dr. Shalini Menon',{phones:[{label:'Work',number:'+91 413 233 4567'}],groupIds:[G[1].id],custom:[{k:'Clinic',v:'Menon Dental Care'}]});
+  const agent=mk('Suresh Shipping Agency',{phones:[{label:'Work',number:'+91 44 2521 8899'}],emails:['ops@sureshshipping.in'],groupIds:[G[2].id],custom:[{k:'CDC renewal agent',v:'Chennai office'}]});
+  const lic=mk('Vijay LIC Advisor',{phones:[{label:'Mobile',number:'+91 98410 22334'}],groupIds:[G[2].id],custom:[{k:'Policy 1',v:'Jeevan Anand 815-4432187'}]});
+  const fr1=mk('Arun Prakash',{phones:[{label:'Mobile',number:'+91 97907 66301'}],emails:['arun.p@yahoo.com'],dob:(yr-33)+'-08-19',groupIds:[G[3].id]});
+  const fr2=mk('Priya Prakash',{phones:[{label:'Mobile',number:'+91 97907 66302'}],dob:(yr-31)+'-12-05',groupIds:[G[3].id]});
+  const sm1=mk('C/O Dmitri Volkov',{phones:[{label:'Mobile',number:'+7 921 334 5566'}],emails:['d.volkov@mail.ru'],groupIds:[G[4].id],custom:[{k:'Last vessel',v:'MV Coral Trader'}]});
+  const sm2=mk('Bosun Reyes',{phones:[{label:'Mobile',number:'+63 917 550 8899'}],groupIds:[G[4].id]});
+  const nb=mk('Muthu (Neighbour)',{phones:[{label:'Mobile',number:'+91 96559 87001'}],address:'14, Beach Road, Puducherry',groupIds:[]});
+  const CS=[amma,appa,bro,drR,drS,agent,lic,fr1,fr2,sm1,sm2,nb];
+  state.contacts.push(...CS);
+  // photos for three (tests media pipeline)
+  for(const [c,hue] of [[amma,28],[fr1,210],[sm1,160]]){
+    const durl=drawDemoPhoto(c.name,hue);const mid=uid();
+    await idbPut({id:mid,contactId:c.id,kind:'profile',dataUrl:durl,mime:'image/jpeg',name:'demo.jpg',ts:t});
+    mediaCache[mid]=durl;c.photoId=mid;
+  }
+  const D=(o)=>Object.assign({id:uid(),created:t,modified:t,deleted:false},o);
+  // dates
+  state.dates.push(
+    D({contactId:fr1.id,label:'Wedding anniversary',date:(yr-5)+'-02-14',recurring:true,remindDays:7}),
+    D({contactId:amma.id,label:'LIC premium due',date:shiftDays(20),recurring:false,remindDays:30}),
+    D({contactId:sm1.id,label:'US C1/D visa expiry',date:shiftDays(-12),recurring:false,remindDays:60})
+  );
+  // docs (state records without file payloads for speed; one real file added in tests)
+  state.docs.push(
+    D({contactId:amma.id,mediaId:null,fname:'aadhaar.pdf',mime:'application/pdf',size:180000,title:'Aadhaar card',dtype:'Aadhaar',expiry:'',remindDays:30}),
+    D({contactId:amma.id,mediaId:null,fname:'policy.pdf',mime:'application/pdf',size:220000,title:'Health insurance policy',dtype:'Policy',expiry:shiftDays(15),remindDays:30}),
+    D({contactId:appa.id,mediaId:null,fname:'dl.pdf',mime:'application/pdf',size:90000,title:'Driving licence',dtype:'Licence',expiry:shiftDays(-30),remindDays:30}),
+    D({contactId:bro.id,mediaId:null,fname:'passport.pdf',mime:'application/pdf',size:150000,title:'Passport',dtype:'Passport',expiry:shiftDays(60),remindDays:90}),
+    D({contactId:fr2.id,mediaId:null,fname:'pan.jpg',mime:'application/pdf',size:60000,title:'PAN card',dtype:'PAN',expiry:shiftDays(200),remindDays:30}),
+    D({contactId:amma.id,mediaId:null,fname:'echo_report.pdf',mime:'application/pdf',size:340000,title:'Echo report Jun '+yr,dtype:'Medical report',expiry:'',remindDays:0})
+  );
+  // notes
+  state.notes.push(
+    D({contactId:amma.id,text:'Prefers morning calls before 10. Ask about knee physio progress.',ts:t-86400000*40}),
+    D({contactId:amma.id,text:'BP was 140/90 on last check \u2014 remind about salt.',ts:t-86400000*3}),
+    D({contactId:agent.id,text:'CDC renewal takes 3 weeks \u2014 start before next sign-off.',ts:t-86400000*10}),
+    D({contactId:sm1.id,text:'Good contact for Baltic ice advisories. Owes me a beer.',ts:t-86400000*100})
+  );
+  // promises
+  state.promises.push(
+    D({contactId:bro.id,text:'Bring Casio G-Shock from Singapore',ts:t-86400000*20,done:false}),
+    D({contactId:fr1.id,text:'Return his Bosch drill',ts:t-86400000*60,done:false}),
+    D({contactId:fr2.id,text:'Send wedding photos',ts:t-86400000*90,done:true,doneTs:t-86400000*70}),
+    D({contactId:amma.id,text:'Book Tirupati darshan for December',ts:t-86400000*5,done:false})
+  );
+  // meds
+  state.meds.push(
+    D({contactId:amma.id,name:'Telmisartan 40 mg',dose:'1-0-0 before breakfast',notes:'BP',active:true}),
+    D({contactId:amma.id,name:'Calcium + D3',dose:'0-0-1',notes:'',active:true}),
+    D({contactId:appa.id,name:'Metformin 500 mg',dose:'1-0-1 after food',notes:'Sugar',active:true})
+  );
+  // appointments
+  state.appts.push(
+    D({contactId:amma.id,date:shiftDays(5),time:'10:30',doctor:'Dr. Ramesh Kumar',purpose:'Cardiac review',notes:'Carry echo report'}),
+    D({contactId:appa.id,date:shiftDays(-45),time:'09:00',doctor:'Dr. Shalini Menon',purpose:'Root canal \u2014 done',notes:'Follow-up only if pain'})
+  );
+  // links
+  state.links.push(
+    D({aId:drR.id,bId:amma.id,relation:'doctor'}),
+    D({aId:drS.id,bId:appa.id,relation:'doctor'}),
+    D({aId:fr2.id,bId:fr1.id,relation:'spouse'}),
+    D({aId:bro.id,bId:amma.id,relation:'son'}),
+    D({aId:lic.id,bId:amma.id,relation:'agent'})
+  );
+  save();renderAll();
+  toast('Demo data loaded \u2014 12 people','ok');
+}
+
+/* ===== Theme ===== */
+function applyTheme(){document.body.classList.toggle('amoled',state.settings.theme==='amoled');}
+function setTheme(on){state.settings.theme=on?'amoled':'navy';save();applyTheme();toast(on?'Pure black on':'Navy theme','ok');}
+
+/* ===== Boot ===== */
+(async function boot(){
+  await loadState();
+  applyTheme();
+  nav('home',true);
+  suiteHomeBtn();
+  if('serviceWorker' in navigator&&location.protocol==='https:'){
+    navigator.serviceWorker.register('prm-sw.js').catch(()=>{});
+  }
+})();
+</script>
+</body>
+</html>
