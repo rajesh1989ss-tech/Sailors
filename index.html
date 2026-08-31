@@ -435,7 +435,12 @@
   .crew-row{display:flex; align-items:center; gap:12px; background:linear-gradient(165deg,var(--surface),var(--bg2)); border:1px solid var(--line); border-radius:14px; padding:11px 12px 14px 14px; cursor:pointer; transition:.15s; position:relative; overflow:hidden; -webkit-user-select:none; user-select:none}
   .crew-row:active{transform:scale(.985)}
   .crew-row .cr-bar{position:absolute; left:0; top:0; bottom:0; width:4px}
-  .cr-id{display:flex; align-items:center; gap:12px; flex:0 0 auto; min-width:0; max-width:48%}
+  .cr-id{display:flex; align-items:center; gap:10px; flex:0 0 auto; min-width:0; max-width:48%}
+  /* crew serial number badge */
+  .cr-sl{flex:0 0 auto; min-width:24px; height:24px; padding:0 6px; border-radius:8px; background:var(--surface2);
+    border:1px solid var(--line2); color:var(--txt-mute); font-size:.72rem; font-weight:800; line-height:1;
+    display:grid; place-items:center; letter-spacing:-.2px}
+  .cr-sl.unset{opacity:.45}
   .cr-ava{width:44px; height:44px; border-radius:12px; margin:0; flex:0 0 auto; font-size:.82rem; font-weight:800; letter-spacing:-.3px; line-height:1; padding:2px; text-align:center}
   .cr-idtext{min-width:0}
   .cr-top{display:flex; align-items:center; gap:7px}
@@ -463,8 +468,11 @@
   .cr-bdaybox .bd-c{font-size:1.1rem}
 
   /* contract progress bar along the bottom */
-  .cr-progress{position:absolute; left:14px; right:14px; bottom:5px; height:3px; border-radius:3px; background:var(--line2); overflow:hidden}
+  .cr-progress{position:absolute; left:14px; right:84px; bottom:5px; height:3px; border-radius:3px; background:var(--line2); overflow:hidden}
   .cr-progress-fill{height:100%; border-radius:3px}
+  /* contract completion % — bottom-right of the card, at the end of the bar */
+  .cr-pct{position:absolute; right:13px; bottom:1px; font-size:.68rem; font-weight:800; line-height:1.2; letter-spacing:.2px}
+  .cr-pct span{font-size:.55rem; font-weight:700; color:var(--txt-mute); text-transform:uppercase; letter-spacing:.4px; margin-left:3px}
 
   .cr-team{flex:0 0 auto; width:38px; height:38px; border-radius:10px; border:1px solid var(--line2); background:var(--surface2); color:var(--accent); display:grid; place-items:center; cursor:pointer}
   .cr-team:active{transform:scale(.9)} .cr-team svg{width:18px;height:18px}
@@ -509,6 +517,7 @@
   /* ---------- Crew sort bar ---------- */
   .sort-bar{display:flex; align-items:center; gap:8px; margin-bottom:12px}
   .sort-bar label{font-size:.72rem; color:var(--txt-mute); text-transform:uppercase; letter-spacing:.5px; font-weight:700; flex:0 0 auto}
+  .sort-bar .btn-sm{flex:0 0 auto}
   .sort-bar select{flex:1; background:var(--surface); border:1px solid var(--line2); border-radius:11px; padding:9px 12px; color:var(--txt); font-family:var(--ff); font-size:.85rem; font-weight:600}
   .sort-bar select:focus{outline:none; border-color:var(--accent)}
 
@@ -1230,7 +1239,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script id="seedData" type="application/json">{"crew":[{"id":"demo_c41fcd1af1","name":"Demo Master","rank":"Master","dob":"1975-05-14","placeJoined":"Singapore","dateJoined":"2026-02-22","reliefExpected":"2026-08-31","custom":{"demo_4d6e61847d":"3 yrs","demo_79fdc46f18":"English, Tagalog"},"deleted":false,"createdAt":"2026-02-22T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_0124fdc55c","name":"Demo Chief Officer","rank":"Chief Officer","dob":"1988-02-09","placeJoined":"Singapore","dateJoined":"2026-03-24","reliefExpected":"2026-09-20","custom":{"demo_4d6e61847d":"4 yrs","demo_79fdc46f18":"English, Hindi"},"deleted":false,"createdAt":"2026-03-24T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_55e08f4611","name":"Demo Second Officer","rank":"Second Officer","dob":"1992-11-30","placeJoined":"Singapore","dateJoined":"2026-04-13","reliefExpected":"2026-10-10","custom":{"demo_4d6e61847d":"5 yrs","demo_79fdc46f18":"English, Tagalog"},"deleted":false,"createdAt":"2026-04-13T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_47a34f98cc","name":"Demo Third Officer","rank":"Third Officer","dob":"1996-07-18","placeJoined":"Singapore","dateJoined":"2026-04-23","reliefExpected":"2026-10-25","custom":{"demo_4d6e61847d":"6 yrs","demo_79fdc46f18":"English, Hindi"},"deleted":false,"createdAt":"2026-04-23T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_aff6e87097","name":"Demo Deck Cadet","rank":"Deck Cadet","dob":"2003-01-25","placeJoined":"Singapore","dateJoined":"2026-05-13","reliefExpected":"2026-12-09","custom":{"demo_4d6e61847d":"7 yrs","demo_79fdc46f18":"English, Tagalog"},"deleted":false,"createdAt":"2026-05-13T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_7bcbd6ae6a","name":"Demo Chief Engineer","rank":"Chief Engineer","dob":"1977-09-02","placeJoined":"Singapore","dateJoined":"2026-02-12","reliefExpected":"2026-08-16","custom":{"demo_4d6e61847d":"8 yrs","demo_79fdc46f18":"English, Hindi"},"deleted":false,"createdAt":"2026-02-12T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_802dfef78b","name":"Demo Second Engineer","rank":"Second Engineer","dob":"1986-04-11","placeJoined":"Singapore","dateJoined":"2026-03-14","reliefExpected":"2026-09-15","custom":{"demo_4d6e61847d":"9 yrs","demo_79fdc46f18":"English, Tagalog"},"deleted":false,"createdAt":"2026-03-14T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_3e48b13565","name":"Demo Bosun","rank":"Bosun","dob":"1982-12-06","placeJoined":"Singapore","dateJoined":"2026-02-27","reliefExpected":"2026-08-26","custom":{"demo_4d6e61847d":"10 yrs","demo_79fdc46f18":"English, Hindi"},"deleted":false,"createdAt":"2026-02-27T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_8d2d160bc2","name":"Demo AB","rank":"AB (4-8)","dob":"1991-03-21","placeJoined":"Singapore","dateJoined":"2026-04-03","reliefExpected":"2026-09-30","custom":{"demo_4d6e61847d":"11 yrs","demo_79fdc46f18":"English, Tagalog"},"deleted":false,"createdAt":"2026-04-03T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_371a5c6e1c","name":"Demo Chief Cook","rank":"Chief Cook","dob":"1980-08-16","placeJoined":"Singapore","dateJoined":"2026-03-09","reliefExpected":"2026-09-10","custom":{"demo_4d6e61847d":"12 yrs","demo_79fdc46f18":"English, Hindi"},"deleted":false,"createdAt":"2026-03-09T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"logs":[{"id":"demo_6f00e7091d","crewId":"demo_c41fcd1af1","text":"Completed familiarisation checklist","ts":"2026-07-10T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_5b7c36b9e4","crewId":"demo_0124fdc55c","text":"Completed familiarisation checklist","ts":"2026-07-06T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_8d1434adf7","crewId":"demo_55e08f4611","text":"Completed familiarisation checklist","ts":"2026-07-02T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_06415f9fb8","crewId":"demo_47a34f98cc","text":"Completed familiarisation checklist","ts":"2026-06-28T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_b0d52fd707","crewId":"demo_aff6e87097","text":"Completed familiarisation checklist","ts":"2026-06-24T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_5319976c83","crewId":"demo_7bcbd6ae6a","text":"Completed familiarisation checklist","ts":"2026-06-20T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"}],"tasks":[{"id":"demo_85300d8da9","crewId":"demo_c41fcd1af1","title":"Monthly LSA inspection","notes":"Lifeboats, liferafts, EEBDs","due":"2026-07-19","status":"pending","doneAt":"","deleted":false,"createdAt":"2026-07-02T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_c4a9b4eeb0","crewId":"demo_0124fdc55c","title":"Test emergency fire pump","notes":"Record suction pressure","due":"2026-07-26","status":"pending","doneAt":"","deleted":false,"createdAt":"2026-07-01T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_0af50147a4","crewId":"demo_55e08f4611","title":"Sound all ballast tanks","notes":"Before arrival","due":"2026-07-23","status":"progress","doneAt":"","deleted":false,"createdAt":"2026-06-30T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_d226a7d0ab","crewId":"demo_47a34f98cc","title":"Grease deck crane bearings","notes":"6 points, EP2","due":"2026-08-03","status":"pending","doneAt":"","deleted":false,"createdAt":"2026-06-29T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_0342e5e8a0","crewId":"demo_aff6e87097","title":"Weekly steering gear test","notes":"Both pumps + alarms","due":"2026-07-22","status":"done","doneAt":"2026-07-20T10:00:00.000Z","deleted":false,"createdAt":"2026-06-28T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_6479784d1f","crewId":"demo_7bcbd6ae6a","title":"Check IG deck seal water flow","notes":"","due":"2026-07-28","status":"pending","doneAt":"","deleted":false,"createdAt":"2026-06-27T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"requisitions":[{"id":"demo_64e7d72287","crewId":"demo_0124fdc55c","text":"Wire rope 20mm x 220m","status":"done","photos":[],"ts":"2026-07-14T14:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_91ae95ec3e","crewId":"demo_55e08f4611","text":"Chemical resistant gloves \u2014 20 pairs","status":"open","photos":[],"ts":"2026-07-10T14:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_a28e97dd98","crewId":"demo_47a34f98cc","text":"Grease EP2 cartridges \u2014 40 nos","status":"open","photos":[],"ts":"2026-07-06T14:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_7ac1f3078f","crewId":"demo_aff6e87097","text":"Safety helmets \u2014 10 nos","status":"open","photos":[],"ts":"2026-07-02T14:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"}],"nearmiss":[{"id":"demo_2c15cfc975","crewId":"demo_47a34f98cc","text":"Spanner left on top of ballast pump","sev":"high","photos":[],"ts":"2026-07-16T16:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_f5fd644420","crewId":"demo_47a34f98cc","text":"Hose left across main deck walkway","sev":"low","photos":[],"ts":"2026-07-16T16:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_e7555ea72a","crewId":"demo_47a34f98cc","text":"Gangway net not rigged during berthing","sev":"med","photos":[],"ts":"2026-07-16T16:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"}],"discussion":[{"id":"demo_21e8211a40","crewId":"demo_c41fcd1af1","kind":"q","text":"Submit overtime sheet before the 28th","photos":[],"ts":"2026-07-17T15:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_68af4fd2b8","crewId":"demo_0124fdc55c","kind":"q","text":"Complete ECDIS familiarisation checklist","photos":[],"ts":"2026-07-14T15:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z","done":true,"doneAt":"2026-07-20T10:00:00.000Z"},{"id":"demo_60a97dcba8","crewId":"demo_55e08f4611","kind":"q","text":"Show me your enclosed space entry log","photos":[],"ts":"2026-07-11T15:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_ccceeebe95","crewId":"demo_47a34f98cc","kind":"q","text":"Confirm harness inspection is recorded","photos":[],"ts":"2026-07-08T15:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z","done":true,"doneAt":"2026-07-20T10:00:00.000Z"},{"id":"demo_494c5d3960","crewId":"demo_0124fdc55c","kind":"case","text":"Good initiative during mooring stations \u2014 you spotted the chafed spring line before it parted.","photos":[],"ts":"2026-07-18T11:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_97925c1123","crewId":"demo_0124fdc55c","kind":"case","text":"Always wear gloves when handling wires. A single broken strand can cut deep.","photos":[],"ts":"2026-07-13T11:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_fd3473d766","crewId":"demo_0124fdc55c","kind":"case","text":"Your tank cleaning log entries are neat and complete \u2014 that standard makes vetting easier for everyone.","photos":[],"ts":"2026-07-08T11:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_ac4753befe","crewId":"demo_0124fdc55c","kind":"case","text":"Wait the full ventilation time before entering the pump room. Rushing it is the one shortcut that kills.","photos":[],"ts":"2026-07-03T11:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"}],"files":[],"teams":[{"id":"demo_24a5257fa3","name":"Boat Port","colour":"#38bdf8","members":[{"crewId":"demo_c41fcd1af1","role":"I/C"},{"crewId":"demo_3e48b13565","role":""},{"crewId":"demo_8d2d160bc2","role":""}],"deleted":false,"createdAt":"2026-04-23T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_12f32b6e20","name":"Fire-Emergency Team","colour":"#fbbf24","members":[{"crewId":"demo_0124fdc55c","role":"I/C"},{"crewId":"demo_3e48b13565","role":""},{"crewId":"demo_8d2d160bc2","role":""}],"deleted":false,"createdAt":"2026-04-23T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_38f75c876e","name":"Oil Spill Team","colour":"#34d399","members":[{"crewId":"demo_0124fdc55c","role":"I/C"},{"crewId":"demo_55e08f4611","role":""},{"crewId":"demo_3e48b13565","role":""}],"deleted":false,"createdAt":"2026-04-23T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_ce5cabee4d","name":"Galley Team","colour":"#a78bfa","members":[{"crewId":"demo_371a5c6e1c","role":"I/C"}],"deleted":false,"createdAt":"2026-04-23T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"calnotes":[{"id":"demo_cb06f1cc2e","kind":"note","date":"2026-07-20","text":"Port state control inspection","crewId":"","deleted":false,"createdAt":"2026-07-12T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_cdec789310","kind":"reminder","date":"2026-07-25","text":"Monthly fire and boat drill","crewId":"","deleted":false,"createdAt":"2026-07-12T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_fc60c270ef","kind":"reminder","date":"2026-07-30","text":"Submit crew rest hours to office","crewId":"","deleted":false,"createdAt":"2026-07-12T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_c75ee1c075","kind":"note","date":"2026-07-22","text":"Tank cleaning commenced","crewId":"","deleted":false,"createdAt":"2026-07-12T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"jobtemplates":[{"id":"demo_bed35a423b","name":"Pre-arrival checklist","items":[{"id":"demo_35e98795b3","text":"Test main engine astern movement"},{"id":"demo_24335a5049","text":"Test steering gear both pumps"},{"id":"demo_c24243f76c","text":"Sound all tanks and record"},{"id":"demo_d562bc4732","text":"Check anchor and windlass ready"},{"id":"demo_f4d9acb1b5","text":"Test whistle and navigation lights"},{"id":"demo_077bce82a1","text":"Brief mooring stations"}],"deleted":false,"createdAt":"2026-05-23T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"joblists":[{"id":"demo_3a8c6d5edd","name":"Pre-arrival checklist \u2014 2026-07-21","fromTpl":"demo_bed35a423b","items":[{"id":"demo_5a3cd413c1","text":"Test main engine astern movement","done":true,"doneAt":"2026-07-21T10:00:00.000Z","by":""},{"id":"demo_b51a1fe89a","text":"Test steering gear both pumps","done":true,"doneAt":"2026-07-21T10:00:00.000Z","by":""},{"id":"demo_cc56815373","text":"Sound all tanks and record","done":true,"doneAt":"2026-07-21T10:00:00.000Z","by":""},{"id":"demo_f4acb7c0c7","text":"Check anchor and windlass ready","done":false,"doneAt":"","by":""},{"id":"demo_d5b869c3b8","text":"Test whistle and navigation lights","done":false,"doneAt":"","by":""},{"id":"demo_1d06bdbbb2","text":"Brief mooring stations","done":false,"doneAt":"","by":""}],"archived":false,"deleted":false,"createdAt":"2026-07-21T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"customfields":[{"id":"demo_4d6e61847d","title":"Rank Experience","deleted":false,"createdAt":"2026-04-13T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_79fdc46f18","title":"Languages Known","deleted":false,"createdAt":"2026-04-13T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"workshifts":[{"id":"demo_dba1887a5f","op":"sailing","title":"4\u20138 Watch","time":"0400\u20130800 & 1600\u20132000","note":"","members":["demo_47a34f98cc","demo_8d2d160bc2"],"order":0,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_05d58bb664","op":"sailing","title":"8\u201312 Watch","time":"0800\u20131200 & 2000\u20132400","note":"","members":["demo_55e08f4611"],"order":1,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_54f32fc703","op":"sailing","title":"12\u20134 Watch","time":"1200\u20131600 & 0000\u20130400","note":"","members":["demo_0124fdc55c"],"order":2,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_3b8b3d44b6","op":"sailing","title":"Day work","time":"0800\u20131200 & 1300\u20131700","note":"","members":["demo_aff6e87097","demo_3e48b13565","demo_371a5c6e1c"],"order":3,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_880261d075","op":"tclean","title":"Team 6\u201312","time":"0600\u20131200 & 1800\u20132400","note":"","members":["demo_47a34f98cc","demo_8d2d160bc2"],"order":0,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_0e177bb4be","op":"tclean","title":"Team 12\u20136","time":"1200\u20131800 & 0000\u20130600","note":"","members":["demo_55e08f4611","demo_3e48b13565"],"order":1,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_cd1f325e8c","op":"port","title":"Cargo watch 6\u201312","time":"0600\u20131200","note":"","members":["demo_47a34f98cc"],"order":0,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_f003d526d5","op":"port","title":"Cargo watch 12\u201318","time":"1200\u20131800","note":"","members":["demo_55e08f4611"],"order":1,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_52d21bac8d","op":"port","title":"Gangway / day work","time":"0800\u20131700","note":"","members":["demo_aff6e87097"],"order":2,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_3340a154f0","kind":"ot","op":"sailing","crewId":"demo_0124fdc55c","time":"0800\u20131200 & 1300\u20131500","note":"Cargo paperwork","deleted":false,"createdAt":"2026-06-02T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_3caa27465c","kind":"ot","op":"sailing","crewId":"demo_3e48b13565","time":"0800\u20131200 & 1300\u20131700","note":"Deck maintenance","deleted":false,"createdAt":"2026-06-02T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"voyages":[{"id":"demo_9c00db855f","vno":"V2026-DEMO","currentLeg":null,"legs":[{"from":"Kandla","to":"Mundra","start":"2026-07-13","end":"2026-07-16","op":"Loading","details":"EDC 5K"},{"from":"Mundra","to":"Sikka","start":"2026-07-17","end":"2026-07-20","op":"Loading","details":"Meoh 10K"},{"from":"Sikka","to":"Dahej","start":"2026-07-21","end":"2026-07-27","op":"Bunkering","details":"HFO 500MT"}],"deleted":false,"createdAt":"2026-07-07T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}]}</script>
+<script id="seedData" type="application/json">{"crew":[{"id":"demo_c41fcd1af1","slno":1,"name":"Demo Master","rank":"Master","dob":"1975-05-14","placeJoined":"Singapore","dateJoined":"2026-02-22","reliefExpected":"2026-08-31","custom":{"demo_4d6e61847d":"3 yrs","demo_79fdc46f18":"English, Tagalog"},"deleted":false,"createdAt":"2026-02-22T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_0124fdc55c","slno":2,"name":"Demo Chief Officer","rank":"Chief Officer","dob":"1988-02-09","placeJoined":"Singapore","dateJoined":"2026-03-24","reliefExpected":"2026-09-20","custom":{"demo_4d6e61847d":"4 yrs","demo_79fdc46f18":"English, Hindi"},"deleted":false,"createdAt":"2026-03-24T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_55e08f4611","slno":3,"name":"Demo Second Officer","rank":"Second Officer","dob":"1992-11-30","placeJoined":"Singapore","dateJoined":"2026-04-13","reliefExpected":"2026-10-10","custom":{"demo_4d6e61847d":"5 yrs","demo_79fdc46f18":"English, Tagalog"},"deleted":false,"createdAt":"2026-04-13T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_47a34f98cc","slno":4,"name":"Demo Third Officer","rank":"Third Officer","dob":"1996-07-18","placeJoined":"Singapore","dateJoined":"2026-04-23","reliefExpected":"2026-10-25","custom":{"demo_4d6e61847d":"6 yrs","demo_79fdc46f18":"English, Hindi"},"deleted":false,"createdAt":"2026-04-23T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_aff6e87097","slno":5,"name":"Demo Deck Cadet","rank":"Deck Cadet","dob":"2003-01-25","placeJoined":"Singapore","dateJoined":"2026-05-13","reliefExpected":"2026-12-09","custom":{"demo_4d6e61847d":"7 yrs","demo_79fdc46f18":"English, Tagalog"},"deleted":false,"createdAt":"2026-05-13T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_7bcbd6ae6a","slno":6,"name":"Demo Chief Engineer","rank":"Chief Engineer","dob":"1977-09-02","placeJoined":"Singapore","dateJoined":"2026-02-12","reliefExpected":"2026-08-16","custom":{"demo_4d6e61847d":"8 yrs","demo_79fdc46f18":"English, Hindi"},"deleted":false,"createdAt":"2026-02-12T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_802dfef78b","slno":7,"name":"Demo Second Engineer","rank":"Second Engineer","dob":"1986-04-11","placeJoined":"Singapore","dateJoined":"2026-03-14","reliefExpected":"2026-09-15","custom":{"demo_4d6e61847d":"9 yrs","demo_79fdc46f18":"English, Tagalog"},"deleted":false,"createdAt":"2026-03-14T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_3e48b13565","slno":8,"name":"Demo Bosun","rank":"Bosun","dob":"1982-12-06","placeJoined":"Singapore","dateJoined":"2026-02-27","reliefExpected":"2026-08-26","custom":{"demo_4d6e61847d":"10 yrs","demo_79fdc46f18":"English, Hindi"},"deleted":false,"createdAt":"2026-02-27T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_8d2d160bc2","slno":9,"name":"Demo AB","rank":"AB (4-8)","dob":"1991-03-21","placeJoined":"Singapore","dateJoined":"2026-04-03","reliefExpected":"2026-09-30","custom":{"demo_4d6e61847d":"11 yrs","demo_79fdc46f18":"English, Tagalog"},"deleted":false,"createdAt":"2026-04-03T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_371a5c6e1c","slno":10,"name":"Demo Chief Cook","rank":"Chief Cook","dob":"1980-08-16","placeJoined":"Singapore","dateJoined":"2026-03-09","reliefExpected":"2026-09-10","custom":{"demo_4d6e61847d":"12 yrs","demo_79fdc46f18":"English, Hindi"},"deleted":false,"createdAt":"2026-03-09T00:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"logs":[{"id":"demo_6f00e7091d","crewId":"demo_c41fcd1af1","text":"Completed familiarisation checklist","ts":"2026-07-10T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_5b7c36b9e4","crewId":"demo_0124fdc55c","text":"Completed familiarisation checklist","ts":"2026-07-06T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_8d1434adf7","crewId":"demo_55e08f4611","text":"Completed familiarisation checklist","ts":"2026-07-02T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_06415f9fb8","crewId":"demo_47a34f98cc","text":"Completed familiarisation checklist","ts":"2026-06-28T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_b0d52fd707","crewId":"demo_aff6e87097","text":"Completed familiarisation checklist","ts":"2026-06-24T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_5319976c83","crewId":"demo_7bcbd6ae6a","text":"Completed familiarisation checklist","ts":"2026-06-20T13:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"}],"tasks":[{"id":"demo_85300d8da9","crewId":"demo_c41fcd1af1","title":"Monthly LSA inspection","notes":"Lifeboats, liferafts, EEBDs","due":"2026-07-19","status":"pending","doneAt":"","deleted":false,"createdAt":"2026-07-02T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_c4a9b4eeb0","crewId":"demo_0124fdc55c","title":"Test emergency fire pump","notes":"Record suction pressure","due":"2026-07-26","status":"pending","doneAt":"","deleted":false,"createdAt":"2026-07-01T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_0af50147a4","crewId":"demo_55e08f4611","title":"Sound all ballast tanks","notes":"Before arrival","due":"2026-07-23","status":"progress","doneAt":"","deleted":false,"createdAt":"2026-06-30T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_d226a7d0ab","crewId":"demo_47a34f98cc","title":"Grease deck crane bearings","notes":"6 points, EP2","due":"2026-08-03","status":"pending","doneAt":"","deleted":false,"createdAt":"2026-06-29T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_0342e5e8a0","crewId":"demo_aff6e87097","title":"Weekly steering gear test","notes":"Both pumps + alarms","due":"2026-07-22","status":"done","doneAt":"2026-07-20T10:00:00.000Z","deleted":false,"createdAt":"2026-06-28T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_6479784d1f","crewId":"demo_7bcbd6ae6a","title":"Check IG deck seal water flow","notes":"","due":"2026-07-28","status":"pending","doneAt":"","deleted":false,"createdAt":"2026-06-27T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"requisitions":[{"id":"demo_64e7d72287","crewId":"demo_0124fdc55c","text":"Wire rope 20mm x 220m","status":"done","photos":[],"ts":"2026-07-14T14:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_91ae95ec3e","crewId":"demo_55e08f4611","text":"Chemical resistant gloves \u2014 20 pairs","status":"open","photos":[],"ts":"2026-07-10T14:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_a28e97dd98","crewId":"demo_47a34f98cc","text":"Grease EP2 cartridges \u2014 40 nos","status":"open","photos":[],"ts":"2026-07-06T14:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_7ac1f3078f","crewId":"demo_aff6e87097","text":"Safety helmets \u2014 10 nos","status":"open","photos":[],"ts":"2026-07-02T14:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"}],"nearmiss":[{"id":"demo_2c15cfc975","crewId":"demo_47a34f98cc","text":"Spanner left on top of ballast pump","sev":"high","photos":[],"ts":"2026-07-16T16:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_f5fd644420","crewId":"demo_47a34f98cc","text":"Hose left across main deck walkway","sev":"low","photos":[],"ts":"2026-07-16T16:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_e7555ea72a","crewId":"demo_47a34f98cc","text":"Gangway net not rigged during berthing","sev":"med","photos":[],"ts":"2026-07-16T16:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"}],"discussion":[{"id":"demo_21e8211a40","crewId":"demo_c41fcd1af1","kind":"q","text":"Submit overtime sheet before the 28th","photos":[],"ts":"2026-07-17T15:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_68af4fd2b8","crewId":"demo_0124fdc55c","kind":"q","text":"Complete ECDIS familiarisation checklist","photos":[],"ts":"2026-07-14T15:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z","done":true,"doneAt":"2026-07-20T10:00:00.000Z"},{"id":"demo_60a97dcba8","crewId":"demo_55e08f4611","kind":"q","text":"Show me your enclosed space entry log","photos":[],"ts":"2026-07-11T15:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_ccceeebe95","crewId":"demo_47a34f98cc","kind":"q","text":"Confirm harness inspection is recorded","photos":[],"ts":"2026-07-08T15:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z","done":true,"doneAt":"2026-07-20T10:00:00.000Z"},{"id":"demo_494c5d3960","crewId":"demo_0124fdc55c","kind":"case","text":"Good initiative during mooring stations \u2014 you spotted the chafed spring line before it parted.","photos":[],"ts":"2026-07-18T11:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_97925c1123","crewId":"demo_0124fdc55c","kind":"case","text":"Always wear gloves when handling wires. A single broken strand can cut deep.","photos":[],"ts":"2026-07-13T11:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_fd3473d766","crewId":"demo_0124fdc55c","kind":"case","text":"Your tank cleaning log entries are neat and complete \u2014 that standard makes vetting easier for everyone.","photos":[],"ts":"2026-07-08T11:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_ac4753befe","crewId":"demo_0124fdc55c","kind":"case","text":"Wait the full ventilation time before entering the pump room. Rushing it is the one shortcut that kills.","photos":[],"ts":"2026-07-03T11:00:00.000Z","deleted":false,"updatedAt":"2026-07-21T00:00:00.000Z"}],"files":[],"teams":[{"id":"demo_24a5257fa3","name":"Boat Port","colour":"#38bdf8","members":[{"crewId":"demo_c41fcd1af1","role":"I/C"},{"crewId":"demo_3e48b13565","role":""},{"crewId":"demo_8d2d160bc2","role":""}],"deleted":false,"createdAt":"2026-04-23T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_12f32b6e20","name":"Fire-Emergency Team","colour":"#fbbf24","members":[{"crewId":"demo_0124fdc55c","role":"I/C"},{"crewId":"demo_3e48b13565","role":""},{"crewId":"demo_8d2d160bc2","role":""}],"deleted":false,"createdAt":"2026-04-23T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_38f75c876e","name":"Oil Spill Team","colour":"#34d399","members":[{"crewId":"demo_0124fdc55c","role":"I/C"},{"crewId":"demo_55e08f4611","role":""},{"crewId":"demo_3e48b13565","role":""}],"deleted":false,"createdAt":"2026-04-23T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_ce5cabee4d","name":"Galley Team","colour":"#a78bfa","members":[{"crewId":"demo_371a5c6e1c","role":"I/C"}],"deleted":false,"createdAt":"2026-04-23T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"calnotes":[{"id":"demo_cb06f1cc2e","kind":"note","date":"2026-07-20","text":"Port state control inspection","crewId":"","deleted":false,"createdAt":"2026-07-12T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_cdec789310","kind":"reminder","date":"2026-07-25","text":"Monthly fire and boat drill","crewId":"","deleted":false,"createdAt":"2026-07-12T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_fc60c270ef","kind":"reminder","date":"2026-07-30","text":"Submit crew rest hours to office","crewId":"","deleted":false,"createdAt":"2026-07-12T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_c75ee1c075","kind":"note","date":"2026-07-22","text":"Tank cleaning commenced","crewId":"","deleted":false,"createdAt":"2026-07-12T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"jobtemplates":[{"id":"demo_bed35a423b","name":"Pre-arrival checklist","items":[{"id":"demo_35e98795b3","text":"Test main engine astern movement"},{"id":"demo_24335a5049","text":"Test steering gear both pumps"},{"id":"demo_c24243f76c","text":"Sound all tanks and record"},{"id":"demo_d562bc4732","text":"Check anchor and windlass ready"},{"id":"demo_f4d9acb1b5","text":"Test whistle and navigation lights"},{"id":"demo_077bce82a1","text":"Brief mooring stations"}],"deleted":false,"createdAt":"2026-05-23T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"joblists":[{"id":"demo_3a8c6d5edd","name":"Pre-arrival checklist \u2014 2026-07-21","fromTpl":"demo_bed35a423b","items":[{"id":"demo_5a3cd413c1","text":"Test main engine astern movement","done":true,"doneAt":"2026-07-21T10:00:00.000Z","by":""},{"id":"demo_b51a1fe89a","text":"Test steering gear both pumps","done":true,"doneAt":"2026-07-21T10:00:00.000Z","by":""},{"id":"demo_cc56815373","text":"Sound all tanks and record","done":true,"doneAt":"2026-07-21T10:00:00.000Z","by":""},{"id":"demo_f4acb7c0c7","text":"Check anchor and windlass ready","done":false,"doneAt":"","by":""},{"id":"demo_d5b869c3b8","text":"Test whistle and navigation lights","done":false,"doneAt":"","by":""},{"id":"demo_1d06bdbbb2","text":"Brief mooring stations","done":false,"doneAt":"","by":""}],"archived":false,"deleted":false,"createdAt":"2026-07-21T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"customfields":[{"id":"demo_4d6e61847d","title":"Rank Experience","deleted":false,"createdAt":"2026-04-13T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_79fdc46f18","title":"Languages Known","deleted":false,"createdAt":"2026-04-13T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"workshifts":[{"id":"demo_dba1887a5f","op":"sailing","title":"4\u20138 Watch","time":"0400\u20130800 & 1600\u20132000","note":"","members":["demo_47a34f98cc","demo_8d2d160bc2"],"order":0,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_05d58bb664","op":"sailing","title":"8\u201312 Watch","time":"0800\u20131200 & 2000\u20132400","note":"","members":["demo_55e08f4611"],"order":1,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_54f32fc703","op":"sailing","title":"12\u20134 Watch","time":"1200\u20131600 & 0000\u20130400","note":"","members":["demo_0124fdc55c"],"order":2,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_3b8b3d44b6","op":"sailing","title":"Day work","time":"0800\u20131200 & 1300\u20131700","note":"","members":["demo_aff6e87097","demo_3e48b13565","demo_371a5c6e1c"],"order":3,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_880261d075","op":"tclean","title":"Team 6\u201312","time":"0600\u20131200 & 1800\u20132400","note":"","members":["demo_47a34f98cc","demo_8d2d160bc2"],"order":0,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_0e177bb4be","op":"tclean","title":"Team 12\u20136","time":"1200\u20131800 & 0000\u20130600","note":"","members":["demo_55e08f4611","demo_3e48b13565"],"order":1,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_cd1f325e8c","op":"port","title":"Cargo watch 6\u201312","time":"0600\u20131200","note":"","members":["demo_47a34f98cc"],"order":0,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_f003d526d5","op":"port","title":"Cargo watch 12\u201318","time":"1200\u20131800","note":"","members":["demo_55e08f4611"],"order":1,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_52d21bac8d","op":"port","title":"Gangway / day work","time":"0800\u20131700","note":"","members":["demo_aff6e87097"],"order":2,"deleted":false,"createdAt":"2026-05-03T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_3340a154f0","kind":"ot","op":"sailing","crewId":"demo_0124fdc55c","time":"0800\u20131200 & 1300\u20131500","note":"Cargo paperwork","deleted":false,"createdAt":"2026-06-02T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"},{"id":"demo_3caa27465c","kind":"ot","op":"sailing","crewId":"demo_3e48b13565","time":"0800\u20131200 & 1300\u20131700","note":"Deck maintenance","deleted":false,"createdAt":"2026-06-02T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}],"voyages":[{"id":"demo_9c00db855f","vno":"V2026-DEMO","currentLeg":null,"legs":[{"from":"Kandla","to":"Mundra","start":"2026-07-13","end":"2026-07-16","op":"Loading","details":"EDC 5K"},{"from":"Mundra","to":"Sikka","start":"2026-07-17","end":"2026-07-20","op":"Loading","details":"Meoh 10K"},{"from":"Sikka","to":"Dahej","start":"2026-07-21","end":"2026-07-27","op":"Bunkering","details":"HFO 500MT"}],"deleted":false,"createdAt":"2026-07-07T10:00:00.000Z","updatedAt":"2026-07-21T00:00:00.000Z"}]}</script>
 <script>
 /* ============================================================
    SAILORS — Phase 1
@@ -1398,6 +1407,20 @@ function contractPct(c){
   const pct=Math.round(((now-start)/total)*100);
   return Math.max(0,Math.min(100,pct));
 }
+/* ---- Crew Sl.No (serial number) ----
+   Optional per-crew number that drives the order the whole app lists crew in.
+   Unnumbered crew keep sorting by rank, after everyone who has a number. */
+function slnoOf(c){const n=parseInt(c&&c.slno,10);return Number.isFinite(n)&&n>0?n:null;}
+function slnoText(c){const n=slnoOf(c);return n==null?'':String(n);}
+function nextSlno(list){return (list||crew).reduce((m,c)=>Math.max(m,slnoOf(c)||0),0)+1;}
+// Master crew order: Sl.No first (unnumbered last), then rank, then name
+function cmpCrewOrder(a,b){
+  const sa=slnoOf(a), sb=slnoOf(b);
+  if(sa!=null&&sb!=null&&sa!==sb)return sa-sb;
+  if(sa!=null&&sb==null)return -1;
+  if(sa==null&&sb!=null)return 1;
+  return (RANK_ORDER[a.rank]??99)-(RANK_ORDER[b.rank]??99) || (a.name||'').localeCompare(b.name||'');
+}
 // Per-crew task tallies
 function taskTally(crewId){
   const mine=allTasks.filter(t=>t.crewId===crewId);
@@ -1441,13 +1464,13 @@ let allShifts=[]; let schedOp='sailing';   // work schedule rows + active operat
 let allVoyages=[];   // voyage records: {id,vno,legs:[{from,to,start,end}],currentLeg}
 let allCalnotes=[];
 let nmCountMap={};
-let crewSort='rank';
+let crewSort='slno';
 
 let allDisc=[], allReqs=[], allNM=[];
 let allJobTpls=[], allJobLists=[];
 async function load(){
   crew=(await getAll("crew")).filter(c=>!c.deleted && !c.signedOff);
-  crew.sort((a,b)=>(RANK_ORDER[a.rank]??99)-(RANK_ORDER[b.rank]??99) || (a.name||'').localeCompare(b.name||''));
+  crew.sort(cmpCrewOrder);
   allTasks=(await getAll("tasks")).filter(t=>!t.deleted);
   allTeams=(await getAll("teams")).filter(t=>!t.deleted);
   allCalnotes=(await getAll("calnotes")).filter(n=>!n.deleted);
@@ -2099,7 +2122,7 @@ function vrFillLegs(){
 }
 /* ---- Crew Data report: pick any columns (basics + every custom field) ---- */
 const CDR_BASICS=[
-  ['name','Name'],['rank','Rank'],['placeJoined','Place Joined'],
+  ['slno','Crew Sl.No'],['name','Name'],['rank','Rank'],['placeJoined','Place Joined'],
   ['dateJoined','Date Joined'],['reliefExpected','Contract Ends'],['dob','DOB']
 ];
 function openCrewDataReportPicker(){
@@ -2109,7 +2132,7 @@ function openCrewDataReportPicker(){
     <h2>Crew Data report</h2>
     <p class="sheet-sub">Tick the columns you need — the report is built from exactly those. Every crew data field you invent (via Settings or extra import columns) appears here automatically.</p>
     <div class="cdr-h">Basics</div>
-    <div class="cdr-grid">${CDR_BASICS.map(([id,l])=>box('b:'+id,l,id==='name'||id==='rank')).join('')}</div>
+    <div class="cdr-grid">${CDR_BASICS.map(([id,l])=>box('b:'+id,l,id==='slno'||id==='name'||id==='rank')).join('')}</div>
     <div class="cdr-h">Crew data fields</div>
     <div class="cdr-grid">${allFields.length?allFields.map(f=>box('f:'+f.id,f.title,true)).join('')
       :'<div class="mini-empty">No custom fields yet — create them in Settings → Crew data fields, or via extra import columns.</div>'}</div>
@@ -2122,7 +2145,7 @@ function runCrewDataReport(){
   if(!cols.length){toast('Tick at least one column','err');return;}
   const onlyFilled=document.getElementById('cdrOnlyFilled').checked;
   const fCols=cols.filter(c=>c.startsWith('f:')).map(c=>c.slice(2));
-  let list=[...crew].sort((a,b)=>(RANK_ORDER[a.rank]??99)-(RANK_ORDER[b.rank]??99));
+  let list=[...crew].sort(cmpCrewOrder);
   if(onlyFilled&&fCols.length)list=list.filter(c=>fCols.some(fid=>crewCustomVal(c,fid)!==''));
   const head=cols.map(col=>{
     if(col.startsWith('b:')){const b=CDR_BASICS.find(x=>'b:'+x[0]===col);return `<th>${esc(b[1])}</th>`;}
@@ -2130,7 +2153,7 @@ function runCrewDataReport(){
   }).join('');
   const cell=(c,col)=>{
     if(col.startsWith('b:')){
-      const k=col.slice(2); const v=c[k]||'';
+      const k=col.slice(2); const v=k==='slno'?slnoText(c):(c[k]||'');
       if(k==='name')return `<td><b>${esc(v)}</b></td>`;
       return `<td>${(k==='dateJoined'||k==='reliefExpected'||k==='dob')&&v?fmtDate(v):esc(v)||'—'}</td>`;
     }
@@ -2696,6 +2719,21 @@ function renderHomeTeamBar(){
 }
 function setHomeTeam(id){homeTeamFilter=id;renderHomeTeamBar();renderCrew();}
 function setCrewSort(v){crewSort=v;renderCrew();}
+/* Give every crew member a Sl.No, 1..n, in the order currently shown */
+async function renumberCrew(){
+  if(!crew.length){toast('No crew to number','err');return;}
+  if(!confirm(`Renumber all ${crew.length} crew 1–${crew.length} in the order shown? Existing Sl.No values are replaced.`))return;
+  const ordered=sortCrewList(crew);
+  let n=0;
+  for(const c of ordered){
+    n++;
+    if(slnoOf(c)===n)continue;
+    const rec=await getRec("crew",c.id); if(!rec)continue;
+    rec.slno=n; rec.updatedAt=now(); await putRec("crew",rec);
+  }
+  await load();
+  toast(`Crew renumbered 1–${crew.length}`,'ok');
+}
 function sortCrewList(list){
   const arr=[...list];
   switch(crewSort){
@@ -2711,6 +2749,9 @@ function sortCrewList(list){
       break;
     case 'relief':
       arr.sort((a,b)=>(a.reliefExpected||'9999').localeCompare(b.reliefExpected||'9999'));
+      break;
+    case 'slno':
+      arr.sort(cmpCrewOrder);
       break;
     default: // rank
       arr.sort((a,b)=>(RANK_ORDER[a.rank]??99)-(RANK_ORDER[b.rank]??99) || (a.name||'').localeCompare(b.name||''));
@@ -2737,12 +2778,14 @@ function renderCrew(){
   const sortBar=`<div class="sort-bar">
     <label>Sort</label>
     <select onchange="setCrewSort(this.value)">
+      <option value="slno" ${crewSort==='slno'?'selected':''}>Crew Sl.No</option>
       <option value="rank" ${crewSort==='rank'?'selected':''}>Rank</option>
       <option value="bday" ${crewSort==='bday'?'selected':''}>Next Birthday</option>
       <option value="port" ${crewSort==='port'?'selected':''}>Joining Port (A–Z)</option>
       <option value="joined" ${crewSort==='joined'?'selected':''}>Joining Date</option>
       <option value="relief" ${crewSort==='relief'?'selected':''}>Contract End Date</option>
     </select>
+    ${crewSort==='slno'?`<button class="btn btn-ghost btn-sm" onclick="renumberCrew()" title="Give every crew member a Sl.No in the order shown">Renumber</button>`:''}
   </div>`;
   const bset=new Set(birthdaysToday().map(c=>c.id));
   if(!list.length){area.innerHTML=sortBar+'<div class="mini-empty">No crew in this team yet. Tap the edit button above to add members.</div>';return;}
@@ -2753,12 +2796,14 @@ function renderCrew(){
     const ob=onboardText(c);
     const ri=reliefInfo(c);
     const pct=contractPct(c);
+    const sl=slnoOf(c);
     const tt=taskTally(c.id);
     const nmc=nmCountMap[c.id]||0;
     const age=ageFrom(c.dob);
     return `<div class="crew-row" onclick="viewCrew('${c.id}')" oncontextmenu="event.preventDefault();openDossier('${c.id}');return false" data-id="${c.id}">
       <div class="cr-bar" style="background:linear-gradient(${dp.c},${dp.c2})"></div>
       <div class="cr-id">
+        <div class="cr-sl ${sl==null?'unset':''}" title="Crew Sl.No">${sl==null?'–':sl}</div>
         <div class="avatar cr-ava" style="background:linear-gradient(135deg,${dp.c},${dp.c2})">${esc(rankAvatar(c.rank))}</div>
         <div class="cr-idtext">
           <div class="cr-top"><span class="cr-nm ${isBday?'bday-flash':''}">${esc(c.name)}</span></div>
@@ -2787,7 +2832,8 @@ function renderCrew(){
         </div>
       </div>
 
-      ${pct!=null?`<div class="cr-progress" title="Contract ${pct}% complete"><div class="cr-progress-fill" style="width:${pct}%;background:linear-gradient(90deg,${dp.c},${dp.c2})"></div></div>`:''}
+      ${pct!=null?`<div class="cr-progress" title="Contract ${pct}% complete"><div class="cr-progress-fill" style="width:${pct}%;background:linear-gradient(90deg,${dp.c},${dp.c2})"></div></div>
+      <div class="cr-pct" style="color:${dp.c}" title="Contract ${pct}% complete">${pct}%<span>done</span></div>`:''}
 
       <div class="cr-actions">
         <button class="cr-team cr-addtask" onclick="event.stopPropagation();openTaskForm('${c.id}')" title="Add task">
@@ -2887,7 +2933,10 @@ function openCrewForm(id){
     <h2>${c?'Edit':'Add'} crew</h2>
     <p class="sheet-sub">${c?'Update this crew member.':'Add one crew member manually.'}</p>
     <div class="field"><label>Name</label><input id="f_name" value="${c?esc(c.name):''}" placeholder="Full name"></div>
-    <div class="field"><label>Rank</label><select id="f_rank">${RANKS.map(r=>`<option ${c&&c.rank===r?'selected':''}>${r}</option>`).join('')}</select></div>
+    <div class="row2">
+      <div class="field"><label>Crew Sl.No</label><input id="f_slno" type="number" min="1" step="1" value="${c?(slnoOf(c)??''):nextSlno()}" placeholder="e.g. 1"></div>
+      <div class="field"><label>Rank</label><select id="f_rank">${RANKS.map(r=>`<option ${c&&c.rank===r?'selected':''}>${r}</option>`).join('')}</select></div>
+    </div>
     <div class="row2">
       <div class="field"><label>Place joined</label><input id="f_place" value="${c?esc(c.placeJoined||''):''}" placeholder="Port"></div>
       <div class="field"><label>Date joined</label><input id="f_joined" type="date" value="${c?(c.dateJoined||''):''}"></div>
@@ -2900,6 +2949,12 @@ function openCrewForm(id){
     ${c?`<div style="text-align:center;margin-top:10px"><button class="danger-link" onclick="deleteCrew('${c.id}')">Remove from ship</button></div>`:''}
   `);
 }
+// Read a Sl.No input: a positive whole number, or '' when left blank
+function slnoInput(elId){
+  const el=document.getElementById(elId); if(!el)return '';
+  const v=parseInt(el.value,10);
+  return Number.isFinite(v)&&v>0?v:'';
+}
 async function saveCrew(id){
   const name=document.getElementById('f_name').value.trim();
   if(!name){toast('Name is required','err');return;}
@@ -2907,6 +2962,7 @@ async function saveCrew(id){
   const rec={
     id:id||uid(),
     name,
+    slno:slnoInput('f_slno'),
     rank:document.getElementById('f_rank').value,
     placeJoined:document.getElementById('f_place').value.trim(),
     dateJoined:document.getElementById('f_joined').value||'',
@@ -2916,9 +2972,11 @@ async function saveCrew(id){
     createdAt:ex?ex.createdAt:now(),
     updatedAt:now()
   };
+  // a duplicate Sl.No is allowed (ties fall back to rank) but worth flagging
+  const dupe=slnoOf(rec)!=null?crew.find(c=>c.id!==rec.id&&slnoOf(c)===slnoOf(rec)):null;
   await putRec("crew",rec);
   closeSheet(); await load();
-  toast(id?'Crew updated':'Crew added','ok');
+  toast(dupe?`Saved — Sl.No ${slnoOf(rec)} is also used by ${dupe.name}`:(id?'Crew updated':'Crew added'),dupe?'err':'ok');
 }
 async function deleteCrew(id){
   const c=crew.find(x=>x.id===id); if(!c)return;
@@ -3006,6 +3064,7 @@ async function commitSignOff(id){
     newId=uid();
     const rec={
       id:newId, name:newName,
+      slno:c.slno||'',           // the relief takes over the same Sl.No slot
       rank:document.getElementById('so_rank').value,
       placeJoined:document.getElementById('so_place').value.trim(),
       dateJoined:document.getElementById('so_joined').value||'',
@@ -3148,7 +3207,7 @@ async function viewCrew(id){
         <div class="st"><b>${relief!=null?relief:'—'}</b><span>Days to relief</span></div>
       </div>
       <div class="prof-info sm">
-        <span>DOB</span> ${c.dob?fmtDate(c.dob):'—'} &nbsp;·&nbsp; <span>Joined</span> ${c.placeJoined?esc(c.placeJoined)+', ':''}${c.dateJoined?fmtDate(c.dateJoined):'—'} &nbsp;·&nbsp; <span>Contract ends</span> ${c.reliefExpected?fmtDate(c.reliefExpected):'—'}
+        <span>Sl.No</span> ${slnoText(c)||'—'} &nbsp;·&nbsp; <span>DOB</span> ${c.dob?fmtDate(c.dob):'—'} &nbsp;·&nbsp; <span>Joined</span> ${c.placeJoined?esc(c.placeJoined)+', ':''}${c.dateJoined?fmtDate(c.dateJoined):'—'} &nbsp;·&nbsp; <span>Contract ends</span> ${c.reliefExpected?fmtDate(c.reliefExpected):'—'}
       </div>
       ${allFields.length?`<div class="prof-cdata">
         ${allFields.map(f=>{const v=crewCustomVal(c,f.id);return `<span class="pcd"><span>${esc(f.title)}</span><b>${v?esc(v):'—'}</b></span>`;}).join('')}
@@ -4461,13 +4520,13 @@ function reportRoster(grouped){
       const grp=crew.filter(c=>deptOf(c.rank)===d);
       if(!grp.length)return;
       body+=`<div class="pp-crewband" style="background:${deptHex(grp[0].rank)}">${DEPT_COLOR[d].label} — ${grp.length}</div>
-      <table class="pp"><thead><tr><th>Name</th><th>Rank</th><th>Joined</th><th>Place</th><th>Ends</th><th>DOB</th></tr></thead><tbody>
-      ${grp.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.rank)}</td><td>${c.dateJoined?fmtDate(c.dateJoined):'—'}</td><td>${esc(c.placeJoined||'—')}</td><td>${c.reliefExpected?fmtDate(c.reliefExpected):'—'}</td><td>${c.dob?fmtDate(c.dob):'—'}</td></tr>`).join('')}
+      <table class="pp"><thead><tr><th style="width:44px">Sl.No</th><th>Name</th><th>Rank</th><th>Joined</th><th>Place</th><th>Ends</th><th>DOB</th></tr></thead><tbody>
+      ${grp.map(c=>`<tr><td>${slnoText(c)||'—'}</td><td><b>${esc(c.name)}</b></td><td>${esc(c.rank)}</td><td>${c.dateJoined?fmtDate(c.dateJoined):'—'}</td><td>${esc(c.placeJoined||'—')}</td><td>${c.reliefExpected?fmtDate(c.reliefExpected):'—'}</td><td>${c.dob?fmtDate(c.dob):'—'}</td></tr>`).join('')}
       </tbody></table>`;
     });
   }else{
-    body=`<table class="pp"><thead><tr><th style="width:40px">#</th><th>Name</th><th>Rank</th><th>Joined</th><th>Place</th><th>Ends</th><th>DOB</th></tr></thead><tbody>
-    ${crew.map((c,i)=>`<tr><td>${i+1}</td><td><b>${esc(c.name)}</b></td><td>${esc(c.rank)}</td><td>${c.dateJoined?fmtDate(c.dateJoined):'—'}</td><td>${esc(c.placeJoined||'—')}</td><td>${c.reliefExpected?fmtDate(c.reliefExpected):'—'}</td><td>${c.dob?fmtDate(c.dob):'—'}</td></tr>`).join('')}
+    body=`<table class="pp"><thead><tr><th style="width:44px">Sl.No</th><th>Name</th><th>Rank</th><th>Joined</th><th>Place</th><th>Ends</th><th>DOB</th></tr></thead><tbody>
+    ${crew.map((c,i)=>`<tr><td>${slnoText(c)||(i+1)}</td><td><b>${esc(c.name)}</b></td><td>${esc(c.rank)}</td><td>${c.dateJoined?fmtDate(c.dateJoined):'—'}</td><td>${esc(c.placeJoined||'—')}</td><td>${c.reliefExpected?fmtDate(c.reliefExpected):'—'}</td><td>${c.dob?fmtDate(c.dob):'—'}</td></tr>`).join('')}
     </tbody></table>`;
   }
   openPrint('Crew Roster',ppHead('Crew Roster',grouped?'Full complement by department':'Full crew complement')+body+ppFoot());
@@ -4654,8 +4713,8 @@ function openMasterReport(){
   </div>`;
   // Section: roster
   body+=`<div class="pp-section"><h2>Crew Complement</h2>
-    <table class="pp"><thead><tr><th style="width:40px">#</th><th>Name</th><th>Rank</th><th style="width:90px">Joined</th><th>Port</th><th style="width:90px">Ends</th></tr></thead><tbody>
-    ${crew.map((c,i)=>`<tr><td>${i+1}</td><td><b>${esc(c.name)}</b></td><td>${esc(c.rank)}</td><td>${c.dateJoined?fmtDate(c.dateJoined):'—'}</td><td>${esc(c.placeJoined||'—')}</td><td>${c.reliefExpected?fmtDate(c.reliefExpected):'—'}</td></tr>`).join('')}
+    <table class="pp"><thead><tr><th style="width:44px">Sl.No</th><th>Name</th><th>Rank</th><th style="width:90px">Joined</th><th>Port</th><th style="width:90px">Ends</th></tr></thead><tbody>
+    ${crew.map((c,i)=>`<tr><td>${slnoText(c)||(i+1)}</td><td><b>${esc(c.name)}</b></td><td>${esc(c.rank)}</td><td>${c.dateJoined?fmtDate(c.dateJoined):'—'}</td><td>${esc(c.placeJoined||'—')}</td><td>${c.reliefExpected?fmtDate(c.reliefExpected):'—'}</td></tr>`).join('')}
     </tbody></table></div>`;
   const sectionByCrew=(title,rows,rowFn,headCols)=>{
     if(!rows.length)return `<div class="pp-section"><h2>${title}</h2><div class="pp-empty">None logged.</div></div>`;
@@ -5215,9 +5274,9 @@ function crewTemplate(){
   const extras=allFields.length?allFields.map(f=>f.title)
     :['Rank Experience','Languages Known'];
   const pad=extras.map(()=>'').join('\t');
-  return [['Name','Rank','Place Joined','Date Joined','Contract Ends','DOB',...extras].join('\t'),
-    'Rajesh Kumar\tChief Officer\tSingapore\t2025-01-10\t2025-07-10\t1988-04-12\t'+pad,
-    'Suresh Nair\tThird Officer\tMumbai\t2025-03-05\t2025-09-05\t1995-11-22\t'+pad].join('\n');
+  return [['Sl No','Name','Rank','Place Joined','Date Joined','Contract Ends','DOB',...extras].join('\t'),
+    '1\tRajesh Kumar\tChief Officer\tSingapore\t2025-01-10\t2025-07-10\t1988-04-12\t'+pad,
+    '2\tSuresh Nair\tThird Officer\tMumbai\t2025-03-05\t2025-09-05\t1995-11-22\t'+pad].join('\n');
 }
 async function copyCrewTemplate(){
   const t=crewTemplate();
@@ -5228,9 +5287,9 @@ async function copyCrewTemplate(){
 }
 /* Current crew as TSV — edit in Excel, paste back: rows match by name and update */
 function crewCurrentTsv(){
-  const head=['Name','Rank','Place Joined','Date Joined','Contract Ends','DOB',...allFields.map(f=>f.title)].join('\t');
-  const rows=[...crew].sort((a,b)=>(RANK_ORDER[a.rank]??99)-(RANK_ORDER[b.rank]??99)).map(c=>
-    [c.name,c.rank,c.placeJoined||'',c.dateJoined||'',c.reliefExpected||'',c.dob||'',
+  const head=['Sl No','Name','Rank','Place Joined','Date Joined','Contract Ends','DOB',...allFields.map(f=>f.title)].join('\t');
+  const rows=[...crew].sort(cmpCrewOrder).map(c=>
+    [slnoText(c),c.name,c.rank,c.placeJoined||'',c.dateJoined||'',c.reliefExpected||'',c.dob||'',
      ...allFields.map(f=>crewCustomVal(c,f.id))].join('\t'));
   return head+'\n'+rows.join('\n');
 }
@@ -5245,7 +5304,7 @@ async function copyCurrentCrew(){
 function openImport(){
   openSheet(`
     <h2>Import crew</h2>
-    <p class="sheet-sub">First six columns in this order: <b>Name · Rank · Place Joined · Date Joined · Contract Ends · DOB</b>. Any columns after that (with a header row) become <b>crew data fields</b> — Cabin Defects, Special Task Assigned, anything. Re-importing the same sheet later is safe: rows are matched to crew by name and <b>updated, never duplicated</b>, and blank cells never overwrite what's already saved.</p>
+    <p class="sheet-sub">Six basic columns in this order: <b>Name · Rank · Place Joined · Date Joined · Contract Ends · DOB</b>. Add a <b>Sl No</b> column anywhere (with a header) to set each crew member's serial number — the whole app lists crew in that order. Any columns after that (with a header row) become <b>crew data fields</b> — Cabin Defects, Special Task Assigned, anything. Re-importing the same sheet later is safe: rows are matched to crew by name and <b>updated, never duplicated</b>, and blank cells never overwrite what's already saved.</p>
 <div class="seg">
       <button class="active" id="seg-paste" onclick="impMode('paste')">Paste from Excel</button>
       <button id="seg-csv" onclick="impMode('csv')">Upload CSV</button>
@@ -5290,6 +5349,14 @@ function splitLine(line){
   out.push(cur); return out;
 }
 let importExtraCols=[]; // headings of columns 7+ → crew data fields
+let importHasSl=false;  // sheet carried a Crew Sl.No column
+/* A header cell that names the crew serial number column */
+function isSlnoHeader(t){
+  const raw=(t||'').trim();
+  if(raw==='#')return true;
+  const k=raw.toLowerCase().replace(/[^a-z0-9]/g,'');
+  return ['slno','slnos','sno','srno','sl','sr','serial','serialno','serialnumber','crewslno','crewsno','slnumber'].includes(k);
+}
 function crewByExactName(name){
   const k=(name||'').trim().toLowerCase().replace(/\s+/g,' ');
   return k?crew.find(c=>(c.name||'').trim().toLowerCase().replace(/\s+/g,' ')===k)||null:null;
@@ -5301,11 +5368,20 @@ function buildRows(text){
   // detect header
   const firstCells=splitLine(lines[0]).map(s=>s.trim());
   const first=firstCells.map(s=>s.toLowerCase());
-  const looksHeader=first.some(c=>/name|rank|join|relief|contract|dob|birth|place/.test(c));
-  if(looksHeader)importExtraCols=firstCells.slice(6).filter(Boolean); // columns 7+ become crew data fields
+  const looksHeader=first.some(c=>/name|rank|join|relief|contract|dob|birth|place|sl\.?\s*no|serial/.test(c));
+  // A "Sl No" column may sit anywhere; it is lifted out so the six basics keep their order
+  let slIdx=-1;
+  if(looksHeader){
+    slIdx=firstCells.findIndex(isSlnoHeader);
+    importExtraCols=firstCells.filter((_,i)=>i!==slIdx).slice(6).filter(Boolean); // columns 7+ become crew data fields
+  }
+  importHasSl=slIdx>=0;
   const dataLines=looksHeader?lines.slice(1):lines;
   return dataLines.map(line=>{
-    const f=splitLine(line).map(s=>s.trim());
+    const raw=splitLine(line).map(s=>s.trim());
+    const slRaw=slIdx>=0?(raw[slIdx]||''):'';
+    const slN=parseInt(slRaw,10);
+    const f=slIdx>=0?raw.filter((_,i)=>i!==slIdx):raw;
     const rankRaw=f[1]||'';
     const rank=RANKS.find(r=>r.toLowerCase()===rankRaw.toLowerCase()) ||
                RANKS.find(r=>r.toLowerCase().replace(/[^a-z0-9]/g,'')===rankRaw.toLowerCase().replace(/[^a-z0-9]/g,'')) || rankRaw;
@@ -5314,6 +5390,7 @@ function buildRows(text){
     const name=f[0]||'';
     return {
       name, rank, rankRaw,
+      slno:(Number.isFinite(slN)&&slN>0)?slN:'',
       placeJoined:f[2]||'',
       dateJoined:parseDate(f[3])||'',
       reliefExpected:parseDate(f[4])||'',
@@ -5343,9 +5420,10 @@ function showPreview(){
   const newFields=importExtraCols.filter(t=>!fieldByTitle(t));
   el.innerHTML=`
     <div class="preview-wrap"><table class="preview">
-      <thead><tr><th></th><th>Name</th><th>Rank</th><th>Place</th><th>Joined</th><th>Ends</th><th>DOB</th>${importExtraCols.length?'<th>Extras</th>':''}</tr></thead>
+      <thead><tr><th></th>${importHasSl?'<th>Sl</th>':''}<th>Name</th><th>Rank</th><th>Place</th><th>Joined</th><th>Ends</th><th>DOB</th>${importExtraCols.length?'<th>Extras</th>':''}</tr></thead>
       <tbody>${importRows.map(r=>`<tr>
         <td>${r.validName?(r.match?'<span class="pv-tag upd">UPDATE</span>':'<span class="pv-tag new">NEW</span>'):''}</td>
+        ${importHasSl?`<td>${r.slno||'—'}</td>`:''}
         <td class="${r.validName?'':'pv-bad'}">${esc(r.name)||'⚠ missing'}</td>
         <td class="${r.validRank?'':'pv-bad'}" title="${r.validRank?'':'Unknown rank — saved as typed'}">${esc(r.rank)||'—'}${r.validRank?'':' ⚠'}</td>
         <td>${esc(r.placeJoined)||'—'}</td>
@@ -5385,6 +5463,7 @@ async function commitImport(){
         const c=r.match;
         // non-blank basics update; blank cells keep existing values
         if(r.name)c.name=r.name;
+        if(r.slno)c.slno=r.slno;
         if(r.rankRaw)c.rank=r.rank;
         if(r.placeJoined)c.placeJoined=r.placeJoined;
         if(r.dateJoined)c.dateJoined=r.dateJoined;
@@ -5393,7 +5472,7 @@ async function commitImport(){
         setExtras(c);
         c.updatedAt=now(); await putRec("crew",c); updated++;
       }else{
-        const rec={id:uid(),name:r.name,rank:r.rank,placeJoined:r.placeJoined,
+        const rec={id:uid(),name:r.name,slno:r.slno,rank:r.rank,placeJoined:r.placeJoined,
           dateJoined:r.dateJoined,reliefExpected:r.reliefExpected,dob:r.dob,
           deleted:false,createdAt:now(),updatedAt:now()};
         setExtras(rec);
